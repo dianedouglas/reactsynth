@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/'
+const BASE_URL = 'https://protected-escarpment-28699-5084c61b5747.herokuapp.com/'
 const GET_URL = `${BASE_URL}todos`
 const POST_URL = `${BASE_URL}todos`
 const DELETE_URL = (id) => `${BASE_URL}todos/${id}`

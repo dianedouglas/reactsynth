@@ -38,7 +38,6 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>Basic Todo App</h1>
-          <small>You are running this application in <b>{process.env.NODE_ENV}</b> mode.</small>
           <CreateTodo add_todo={createTodo}/>
           <TodoList todo_data={todos} deleteTodo={deleteTodo}/>
         </div>
