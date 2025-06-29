@@ -1,6 +1,6 @@
 import { Todo } from './Todo'
 
-export function TodoList({todo_data}){
+export function TodoList({todo_data, deleteTodo}){
 	return (
 		<div className="todo">
 			{todo_data.map(todo => {
@@ -10,6 +10,7 @@ export function TodoList({todo_data}){
 						key={todo.id} 
 						completed={todo.completed} 
 						title={todo.todo_name}
+						deleteTodo={deleteTodo}
 					/>
 				)
 			})}

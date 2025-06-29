@@ -6,7 +6,7 @@ import './App.css'
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
 
-import { get_todos, create_todo } from './api/endpoints'
+import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
 function App() {
   const [todos, setTodos] = useState([])
@@ -23,7 +23,14 @@ function App() {
 
   const createTodo = async (todo_name) => {
     const todo = await create_todo(todo_name);
-    setTodos([todo, ...todos])
+    // update client side, update state by adding new todo.
+    setTodos([todo, ...todos]);
+  }
+
+  const deleteTodo = async (id) => {
+    const todo = await delete_todo(id);
+    // handle client side, update state by filtering out todo.
+    setTodos(todos.filter(todo => todo.id !== id));
   }
 
   return (
@@ -32,7 +39,7 @@ function App() {
         <div className='app-container'>
           <h1>Basic Todo App</h1>
           <CreateTodo add_todo={createTodo}/>
-          <TodoList todo_data={todos}/>
+          <TodoList todo_data={todos} deleteTodo={deleteTodo}/>
         </div>
       </div>
     </>
