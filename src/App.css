@@ -65,3 +65,9 @@
   padding-left: 25px;
   padding-right: 25px;
 }
+
+.active {
+  background-color: purple;
+  transition: all .2s ease;
+  cursor: pointer;
+}
