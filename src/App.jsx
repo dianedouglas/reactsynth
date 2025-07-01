@@ -6,7 +6,6 @@ import './App.css'
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
 import { Osc1 } from './components/synth/Osc1'
-
 import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
 let actx = new AudioContext();
@@ -87,9 +86,8 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>React Synth</h1>
-          <button onClick={() => {osc1.start()}}>start</button>
-          <button onClick={() => {osc1.stop()}}>stop</button>
           <Osc1 
+            actx={actx} connection={gain1}
             settings={osc1Settings}
             changeSettings={changeOsc1} 
             changeType={changeOsc1Type}
