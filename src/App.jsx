@@ -6,6 +6,7 @@ import './App.css'
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
 import { Osc1 } from './components/synth/Osc1'
+import { Canvas } from './components/Canvas'
 import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
 let actx = new AudioContext();
@@ -86,6 +87,7 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>React Synth</h1>
+          <Canvas width={600} height={400}/>
           <Osc1 
             actx={actx} connection={gain1}
             settings={osc1Settings}
