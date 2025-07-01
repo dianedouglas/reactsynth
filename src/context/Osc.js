@@ -4,7 +4,7 @@ export default class Osc {
     this.envelope = envelope || {
       attack: 1.1,
       decay: 0.1,
-      sustain: 0.5,
+      sustain: 0.2,
       release: 1.1,
     };
     this.osc = actx.createOscillator();
