@@ -87,7 +87,7 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>React Synth</h1>
-          <Canvas width={600} height={400}/>
+          <Canvas />
           <Osc1 
             actx={actx} connection={gain1}
             settings={osc1Settings}

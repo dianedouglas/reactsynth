@@ -7,12 +7,14 @@ export function Canvas({props}){
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return; // Ensure canvas element exists
-    const context = canvas.getContext('2d');
-
-    // Drawing logic goes here
-    context.fillStyle = 'black';
-    context.fillRect(0, 0, canvas.width, canvas.height); // Draw a blue rectangle filling the canvas
-  }, []); // Empty dependency array ensures this runs once after initial render
+    const render = () => {
+      if(circles.length > 0){
+        drawRipples()
+        updateCircles()
+      }
+    }
+    requestAnimationFrame(render)
+  }, [circles]); // Empty dependency array ensures this runs once after initial render
 
   const createRipple = (e) => {
     const canvas = canvasRef.current;
@@ -29,59 +31,53 @@ export function Canvas({props}){
         }
       ]
     })
-    animate();
   }
 
-  function updateRipples() {
-    console.log(circles[0]);
+  function updateCircles() {
+    let width = 300;
+    let height = 200;
+    let maxRadius = Math.sqrt(width * width + height * height) / 6;
+    let rippleSpeed = maxRadius / 1500;
+    setCircles((currentCircles) => {
+      return currentCircles.map(circle => {
+        // increase circle radius on each update if less than max. 
+        // otherwise remove from array.
+        if(circle.radius < maxRadius){
+          circle.radius += rippleSpeed;
+          return circle
+        }
+      })
+    })
+  }
+
+
+  function drawRipples() {
     const canvas = canvasRef.current;
     if (!canvas) return; // Ensure canvas element exists
     const context = canvas.getContext('2d'); 
     let width = canvas.width;
     let height = canvas.height;
-    // let maxRadius = Math.sqrt(width * width + height * height) / 2;
     let maxRadius = Math.sqrt(width * width + height * height) / 6;
     let rippleSpeed = maxRadius / 1500;
-    // let rippleSpeed = maxRadius / 200;
 
     context.clearRect(0, 0, width, height);
-    
-    setCircles((currentCircles) => {
-      return currentCircles.map(circle => {
-        // increase circle radius on each update
-        circle.radius += rippleSpeed;
-        return circle
-      })
-    })
-
-    // remove any circles that are over max width
-    setCircles((currentCircles) => {
-      return currentCircles.filter(circle => {return circle.radius < maxRadius})
-    })
 
     // paint each circle with its increased radius and transparency
-    for (let i = 0; i < circles.length; i++) {
+    circles.map(circle => {
       context.beginPath();
-      context.arc(circles[i].x, circles[i].y, circles[i].radius, 0, Math.PI * 2);
-      let transparency = 1 - (circles[i].radius / maxRadius);
-      console.log('circle index ' + i);
+      context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+      let transparency = 1 - (circle.radius / maxRadius);
       console.log(transparency);
       context.strokeStyle = 'rgba(0, 150, 255, ' + transparency + ')';
       context.stroke();
-    }
-  }
-
-  function animate() {
-      updateRipples();
-      if(circles.length > 0) {
-          requestAnimationFrame(animate);
-      }
+    })
   }
 
   return (
     <div>
       <button onClick={createRipple}>add circle</button>
-      <button onClick={() => updateRipples()}>update ripples</button>
+      <button onClick={() => drawRipples()}>draw ripples</button>
+      <button onClick={() => updateCircles()}>updateCircles</button>
       <canvas 
         ref={canvasRef} 
         width={300} 
