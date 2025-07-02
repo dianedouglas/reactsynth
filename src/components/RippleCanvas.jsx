@@ -1,6 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 const RippleCanvas = () => {
+  // size of canvas
+  const width = 300;
+  const height = 200;
+  // used for calculating how ripples dissipate
+  const goldenRatio = 1.618;
+  const rainIntervalMax = 1500;
+  const rainIntervalMin = 100;
+  const rainIntervalDisplayDefault = 300;
+
+  // ---------- ref objects ------------
   const canvasRef = useRef(null);
   // this holds the current set of circles in a mutable variable 
   // allows us to animate without rerendering the component on every frame when circles updates.
@@ -8,20 +18,29 @@ const RippleCanvas = () => {
   // this holds the most recent animation frame's ID returned on each request
   // when the component unmounts we can call cancelAnimationFrame at the end of useEffect 
   // that way it doesn't continue trying to animate after the component is gone.
-  const requestRef = useRef();   
-  // size of canvas
-  const width = 300;
-  const height = 200;
-  // rippleSpeed is the amount each circle's radius grows per animation frame.
-  const rippleSpeed = 0.16;
-  // circle's transparency is multiplied by the speedOfTransparency on each animation frame.
-  const speedOfTransparency = .996;
-  // when each circle's transparency gets below the threshold it is removed from the array and no longer drawn.
+  const requestRef = useRef();
+  const intervalRef = useRef();
+
+  // ---------- rippleSettings state ------------
+  // rippleSpeed: 
+  //   amount each circle's radius grows per animation frame.
+  // decay: 
+  //   circle's transparency is multiplied by the decay on each animation frame.
+  //   when each circle's transparency gets below the threshold it is removed from the array and no longer drawn.
+  const [rippleSettings, setRippleSettings] = useState({
+    rippleSpeed: 25,
+    decay: 5,
+    rainSpeed: (rainIntervalDisplayDefault * -1) + rainIntervalMin + rainIntervalMax,
+    displayRainSpeed: rainIntervalDisplayDefault,
+  })
+
+  // ---------- ripple constants that do not need sliders ------------
+  // transparencyThreshold
+  //   when each circle is drawn it gets some echoes drawn with it which are smaller circles that are more transparent.
+  // numberOfEchoes:
+  //   each echo's size and transparency is calculated with the golden ratio in relation to the current circle.
   const transparencyThreshold = 0.04;
-  // when each circle is drawn it gets some echoes drawn with it which are smaller circles that are more transparent.
-  // each echo's size and transparency is calculated with the golden ratio in relation to the current circle.
   const numberOfEchoes = 10;
-  const goldenRatio = 1.618;
 
   const drawRipples = () => {
     const canvas = canvasRef.current;
@@ -54,7 +73,10 @@ const RippleCanvas = () => {
     circlesRef.current = circlesRef.current
       .map((circle) => {
         if (circle.transparency > transparencyThreshold) {
-          return { ...circle, radius: circle.radius + rippleSpeed, transparency: circle.transparency * speedOfTransparency };
+          return { ...circle, 
+            radius: circle.radius + 0.04 + rippleSettings.rippleSpeed / 100, 
+            transparency: circle.transparency * (rippleSettings.decay * 0.0032 + 0.98)
+          };
         } else {
           return null; // remove this circle when it gets more transparent than the threshold.
         }
@@ -65,8 +87,15 @@ const RippleCanvas = () => {
   useEffect(() => {
     // Start animation loop once on render then continue it in the background
     requestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(requestRef.current);
-  }, []);
+    intervalRef.current = setInterval(() => {
+        createRipple();
+      }, (rippleSettings.rainSpeed));
+
+    return () => {
+      cancelAnimationFrame(requestRef.current);
+      clearInterval(intervalRef.current);
+    }
+  }, [rippleSettings]);
 
   const animate = () => {
     // each animation frame we update the collection of circles so that they get bigger and more transparent
@@ -85,10 +114,57 @@ const RippleCanvas = () => {
     circlesRef.current.push({ x, y, radius: 1.0, transparency: 1.0 });
   };
 
+  const changeRippleSettings = (e) => {
+    let {value, id} = e.target;
+    setRippleSettings({...rippleSettings, [id]: value})
+  }
+
+  const calculateRainSpeed = (e) => {
+    let {value, min, max} = e.target;
+    let invertedValue = (value * -1) + rainIntervalMin + rainIntervalMax;
+    setRippleSettings({...rippleSettings, rainSpeed: invertedValue, displayRainSpeed: value})
+  }
+
   return (
     <div>
-      <button onClick={createRipple}>Create Ripple</button>
       <canvas ref={canvasRef} width={width} height={height} style={{ border: '1px solid black' }} />
+      <div>
+        <label htmlFor="rippleSpeed">Speed</label>
+        <input 
+          type="range" 
+          id="rippleSpeed" 
+          name="rippleSpeed" 
+          max="100"
+          step="0.01"
+          value={rippleSettings.rippleSpeed}
+          onChange={changeRippleSettings}>
+        </input>
+      </div>
+      <div>
+        <label htmlFor="decay">Sustain</label>
+        <input 
+          type="range" 
+          id="decay" 
+          name="decay" 
+          max="10"
+          step="0.01"
+          value={rippleSettings.decay}
+          onChange={changeRippleSettings}>
+        </input>
+      </div>
+      <div>
+        <label htmlFor="rainSpeed">Amount of Rain</label>
+        <input 
+          type="range" 
+          id="rainSpeed" 
+          name="rainSpeed"
+          min={rainIntervalMin}
+          max={rainIntervalMax}
+          step="20"
+          value={rippleSettings.displayRainSpeed}
+          onChange={calculateRainSpeed}>
+        </input>
+      </div>
     </div>
   );
 };

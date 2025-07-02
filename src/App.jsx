@@ -86,7 +86,7 @@ function App() {
     <>
       <div className='App'>
         <div className='app-container'>
-          <h1>React Synth</h1>
+          <h1>Rain Synth</h1>
           <RippleCanvas />
           <Osc1 
             actx={actx} connection={gain1}
