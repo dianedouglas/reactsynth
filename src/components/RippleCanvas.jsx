@@ -12,8 +12,9 @@ const RippleCanvas = () => {
 
   const width = 300;
   const height = 200;
-  const maxRadius = Math.sqrt(width * width + height * height) / 6;
-  const rippleSpeed = maxRadius / 1500;
+  const maxRadius = Math.sqrt(width * width + height * height) / 5;
+  const rippleSpeed = maxRadius / 800;
+  const speedOfTransparency = .997;
 
   const drawRipples = () => {
     const canvas = canvasRef.current;
@@ -25,17 +26,29 @@ const RippleCanvas = () => {
     circlesRef.current.forEach((circle) => {
       ctx.beginPath();
       ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
-      let transparency = 1 - circle.radius / maxRadius;
-      ctx.strokeStyle = `rgba(0, 150, 255, ${transparency})`;
+      ctx.strokeStyle = `rgba(0, 150, 255, ${circle.transparency})`;
       ctx.stroke();
+
+      // add other circles for echos 
+      let numberOfEchoes = 8;
+      let echoRadius = circle.radius;
+      let echoTransparency = circle.transparency;
+      for (var i = 0; i < numberOfEchoes; i++) {
+        echoRadius = echoRadius / 1.618;
+        echoTransparency = echoTransparency / 1.618;
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, echoRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 150, 255, ${echoTransparency})`;
+        ctx.stroke();
+      }
     });
   };
 
   const updateCircles = () => {
     circlesRef.current = circlesRef.current
       .map((circle) => {
-        if (circle.radius < maxRadius) {
-          return { ...circle, radius: circle.radius + rippleSpeed };
+        if (circle.transparency > 0.05) {
+          return { ...circle, radius: circle.radius + rippleSpeed, transparency: circle.transparency * speedOfTransparency };
         } else {
           return null; // remove this circle when it gets bigger than the maxRadius
         }
@@ -63,7 +76,7 @@ const RippleCanvas = () => {
     if (!canvas) return;
     const x = Math.floor(Math.random() * canvas.width);
     const y = Math.floor(Math.random() * canvas.height);
-    circlesRef.current.push({ x, y, radius: 1.0 });
+    circlesRef.current.push({ x, y, radius: 1.0, transparency: 1.0 });
   };
 
   return (
