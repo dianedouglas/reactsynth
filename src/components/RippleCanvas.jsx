@@ -9,12 +9,19 @@ const RippleCanvas = () => {
   // when the component unmounts we can call cancelAnimationFrame at the end of useEffect 
   // that way it doesn't continue trying to animate after the component is gone.
   const requestRef = useRef();   
-
+  // size of canvas
   const width = 300;
   const height = 200;
-  const maxRadius = Math.sqrt(width * width + height * height) / 5;
-  const rippleSpeed = maxRadius / 800;
-  const speedOfTransparency = .997;
+  // rippleSpeed is the amount each circle's radius grows per animation frame.
+  const rippleSpeed = 0.16;
+  // circle's transparency is multiplied by the speedOfTransparency on each animation frame.
+  const speedOfTransparency = .996;
+  // when each circle's transparency gets below the threshold it is removed from the array and no longer drawn.
+  const transparencyThreshold = 0.04;
+  // when each circle is drawn it gets some echoes drawn with it which are smaller circles that are more transparent.
+  // each echo's size and transparency is calculated with the golden ratio in relation to the current circle.
+  const numberOfEchoes = 10;
+  const goldenRatio = 1.618;
 
   const drawRipples = () => {
     const canvas = canvasRef.current;
@@ -30,12 +37,11 @@ const RippleCanvas = () => {
       ctx.stroke();
 
       // add other circles for echos 
-      let numberOfEchoes = 8;
       let echoRadius = circle.radius;
       let echoTransparency = circle.transparency;
       for (var i = 0; i < numberOfEchoes; i++) {
-        echoRadius = echoRadius / 1.618;
-        echoTransparency = echoTransparency / 1.618;
+        echoRadius = echoRadius / goldenRatio;
+        echoTransparency = echoTransparency / goldenRatio;
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, echoRadius, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(0, 150, 255, ${echoTransparency})`;
@@ -47,10 +53,10 @@ const RippleCanvas = () => {
   const updateCircles = () => {
     circlesRef.current = circlesRef.current
       .map((circle) => {
-        if (circle.transparency > 0.05) {
+        if (circle.transparency > transparencyThreshold) {
           return { ...circle, radius: circle.radius + rippleSpeed, transparency: circle.transparency * speedOfTransparency };
         } else {
-          return null; // remove this circle when it gets bigger than the maxRadius
+          return null; // remove this circle when it gets more transparent than the threshold.
         }
       })
       .filter(Boolean); // remove nulls
