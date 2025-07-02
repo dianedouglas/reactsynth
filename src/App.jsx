@@ -6,6 +6,7 @@ import './App.css'
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
 import { Osc1 } from './components/synth/Osc1'
+import Osc from './context/Osc'
 import RippleCanvas from './components/RippleCanvas'
 import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
@@ -82,20 +83,21 @@ function App() {
     setFilterSettings({...filterSettings, type: id})
   }
 
+  const newNote = (e) => {
+    const newOsc = new Osc(actx, null, null, null, null, gain1);
+  }
+
   return (
     <>
       <div className='App'>
         <div className='app-container'>
           <h1>Rain Synth</h1>
-          <RippleCanvas />
+          <RippleCanvas playNote={newNote}/>
           <Osc1 
-            actx={actx} connection={gain1}
             settings={osc1Settings}
             changeSettings={changeOsc1} 
-            changeType={changeOsc1Type}
             filterSettings={filterSettings}
             changeFilterSettings={changeFilter} 
-            changeFilterType={changeFilterType}
           />
         </div>
       </div>

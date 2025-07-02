@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-const RippleCanvas = () => {
+const RippleCanvas = ({playNote}) => {
   // size of canvas
   const width = 300;
   const height = 200;
@@ -8,7 +8,7 @@ const RippleCanvas = () => {
   const goldenRatio = 1.618;
   const rainIntervalMax = 1500;
   const rainIntervalMin = 100;
-  const rainIntervalDisplayDefault = 300;
+  const rainIntervalDisplayDefault = 200;
 
   // ---------- ref objects ------------
   const canvasRef = useRef(null);
@@ -32,6 +32,7 @@ const RippleCanvas = () => {
     decay: 5,
     rainSpeed: (rainIntervalDisplayDefault * -1) + rainIntervalMin + rainIntervalMax,
     displayRainSpeed: rainIntervalDisplayDefault,
+    isRaining: false
   })
 
   // ---------- ripple constants that do not need sliders ------------
@@ -86,14 +87,16 @@ const RippleCanvas = () => {
 
   useEffect(() => {
     // Start animation loop once on render then continue it in the background
-    requestRef.current = requestAnimationFrame(animate);
-    intervalRef.current = setInterval(() => {
+    if(rippleSettings.isRaining){
+      requestRef.current = requestAnimationFrame(animate);
+      intervalRef.current = setInterval(() => {
         createRipple();
+        playNote();
       }, (rippleSettings.rainSpeed));
-
+    }
     return () => {
-      cancelAnimationFrame(requestRef.current);
       clearInterval(intervalRef.current);
+      cancelAnimationFrame(requestRef.current);
     }
   }, [rippleSettings]);
 
@@ -125,8 +128,27 @@ const RippleCanvas = () => {
     setRippleSettings({...rippleSettings, rainSpeed: invertedValue, displayRainSpeed: value})
   }
 
+  const startRain = () => {
+    setRippleSettings({...rippleSettings, isRaining: true})
+    // Start animation loop once on render then continue it in the background
+    requestRef.current = requestAnimationFrame(animate);
+    intervalRef.current = setInterval(() => {
+      createRipple();
+      playNote();
+    }, (rippleSettings.rainSpeed));
+  }
+
+  const stopRain = () => {
+    clearInterval(intervalRef.current);
+    cancelAnimationFrame(requestRef.current);
+  }
+
   return (
     <div>
+      <div>
+        <button onClick={startRain}>Start</button>
+        <button onClick={stopRain}>Stop</button>
+      </div>
       <canvas ref={canvasRef} width={width} height={height} style={{ border: '1px solid black' }} />
       <div>
         <label htmlFor="rippleSpeed">Speed</label>
