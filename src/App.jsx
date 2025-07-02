@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 
 import './App.css'
@@ -20,7 +20,7 @@ gain1.connect(filter);
 filter.connect(out);
 
 function App() {
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState([]);
   // ************* Todo List stuff
   // run this code to fetch todos on page load or whenever something in brackets changes.
   useEffect(() => {
@@ -48,7 +48,7 @@ function App() {
   // ************** Audio stuff
 
   const [osc1Settings, setOsc1Settings] = useState({
-    frequency: osc1.frequency.value,
+    frequency: 220,
     detune: osc1.detune.value,
     type: osc1.type
   })
@@ -58,6 +58,8 @@ function App() {
     Q: filter.Q.value,
     type: filter.type
   })
+
+  const osc1SettingsRef = useRef(osc1Settings);
 
   const changeOsc1 = (e) => {
     let {value, id} = e.target;
@@ -83,8 +85,13 @@ function App() {
     setFilterSettings({...filterSettings, type: id})
   }
 
-  const newNote = (e) => {
-    const newOsc = new Osc(actx, gain1);
+  useEffect(() => {
+    osc1SettingsRef.current = osc1Settings;
+  }, [osc1Settings]);
+
+  const newNote = () => {
+    const currentSettings = osc1SettingsRef.current;
+    new Osc(actx, gain1, currentSettings.frequency);
   }
 
   return (

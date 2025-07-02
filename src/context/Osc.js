@@ -8,7 +8,7 @@ export default class Osc {
       release: 1,
     };
     this.osc = actx.createOscillator();
-    this.key = frequency || 100;
+    this.key = frequency;
     this.osc.frequency.value = this.calculateFrequency();
     this.osc.detune.value = 0;
     this.osc.type = 'sawtooth';
@@ -29,7 +29,9 @@ export default class Osc {
     const octaveIndex = Math.floor(Math.random() * octaveMultiplierList.length);
     const interval = intervalsMajor[intervalIndex];
     const octaveMultiplier = octaveMultiplierList[octaveIndex];
-    return this.key * interval * octaveMultiplier;
+    let finalFrequency = this.key * interval * octaveMultiplier;
+    console.log('key ' + this.key + ' final frequency ' + finalFrequency);
+    return finalFrequency;
   }
   start(){
     let {currentTime} = this.actx;
