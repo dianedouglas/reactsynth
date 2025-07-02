@@ -1,16 +1,17 @@
 export default class Osc {
-  constructor(actx, type, frequency, detune, envelope, connection) {
+  constructor(actx, connection, frequency, sustain) {
     this.actx = actx;
-    this.envelope = envelope || {
+    this.envelope = {
       attack: 0.1,
       decay: 0.1,
-      sustain: 0.6,
+      sustain: sustain || 0.6,
       release: 1,
     };
     this.osc = actx.createOscillator();
-    this.osc.frequency.value = frequency || 100;
-    this.osc.detune.value = detune || 0;
-    this.osc.type = type || 'sine';
+    this.key = frequency || 100;
+    this.osc.frequency.value = this.calculateFrequency();
+    this.osc.detune.value = 0;
+    this.osc.type = 'sawtooth';
     this.gateGain = actx.createGain();
     this.gateGain.gain.value = 0;
     this.osc.connect(this.gateGain);
@@ -18,6 +19,17 @@ export default class Osc {
     this.easing = 0.1;
     this.osc.start();
     this.start();
+  }
+  calculateFrequency(){
+    // unison, octave, fifth, fourth, third, sixth, maj second. 
+    // duplicates at end for to weight certain notes.
+    const intervalsMajor = [1, 2, 3/2, 4/3, 5/4, 5/3, 9/8, 4/3, 3/2, 1, 2, 3/2];
+    const octaveMultiplierList = [0.5, 1, 2];
+    const intervalIndex = Math.floor(Math.random() * intervalsMajor.length);
+    const octaveIndex = Math.floor(Math.random() * octaveMultiplierList.length);
+    const interval = intervalsMajor[intervalIndex];
+    const octaveMultiplier = octaveMultiplierList[octaveIndex];
+    return this.key * interval * octaveMultiplier;
   }
   start(){
     let {currentTime} = this.actx;

@@ -84,7 +84,7 @@ function App() {
   }
 
   const newNote = (e) => {
-    const newOsc = new Osc(actx, null, null, null, null, gain1);
+    const newOsc = new Osc(actx, gain1);
   }
 
   return (
