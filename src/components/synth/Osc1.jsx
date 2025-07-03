@@ -3,13 +3,14 @@ import { Filter } from './Filter'
 export function Osc1({changeSettings, settings, changeFilterSettings, filterSettings}){
 	return (
 		<div>
-			<label htmlFor="frequency">Pitch</label>
+			<label htmlFor="frequency">Octave</label>
 			<input 
 				type="range" 
 				id="frequency" 
 				name="frequency" 
-				min="110"
-				max="440"
+				min="0"
+				max="3"
+				step="1"
 				value={settings.frequency}
 				onChange={changeSettings}>
 			</input>

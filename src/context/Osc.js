@@ -1,10 +1,9 @@
 export default class Osc {
-  constructor(actx, connection, frequency, rippleSettings, circles) {
+  constructor(actx, connection, baseOctave, rippleSettings, circles) {
     this.actx = actx;
     this.calculateEnvelope(rippleSettings);
     this.osc = actx.createOscillator();
-    this.key = frequency;
-    this.osc.frequency.value = this.calculateFrequency(rippleSettings, circles);
+    this.osc.frequency.value = this.calculateFrequency(rippleSettings, circles, baseOctave);
     // slight detune between -.1 and +.1
     this.osc.detune.value = (Math.random() / 10) - .05;
     this.osc.type = 'sawtooth';
@@ -17,7 +16,7 @@ export default class Osc {
     this.osc.start();
     this.start();
   }
-  calculateFrequency(rippleSettings, circles){
+  calculateFrequency(rippleSettings, circles, baseOctave){
     // unison, octave, fifth, fourth, third, sixth, maj second. 
     // duplicates to weight certain notes.
     let intervalsMajor = [1, 2, 3/2, 4/3, 5/4, 5/3, 9/8, 4/3, 3/2, 1, 2, 3/2]
@@ -55,8 +54,11 @@ export default class Osc {
     const heightIndex = Math.abs(Math.ceil((y * yMultiplier) + b));
     const interval = intervalsMajor[widthIndex];
     const octaveMultiplier = octaveMultiplierList[heightIndex];
-    let finalFrequency = this.key * interval * octaveMultiplier;
-    // console.log('key ' + this.key + ' final frequency ' + finalFrequency);
+    // lastly, calculate keyFreq from a default lowest frequency.
+    const LOWEST_FREQUENCY = 55;
+    let keyFreq = LOWEST_FREQUENCY + (LOWEST_FREQUENCY * baseOctave);
+    console.log(keyFreq);
+    let finalFrequency = keyFreq * interval * octaveMultiplier;
     return finalFrequency;
   }
   calculateEnvelope(rippleSettings){

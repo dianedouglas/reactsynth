@@ -48,7 +48,7 @@ function App() {
   // ************** Audio stuff
 
   const [osc1Settings, setOsc1Settings] = useState({
-    frequency: 220,
+    frequency: 1,
     detune: osc1.detune.value,
     type: osc1.type
   })
@@ -90,6 +90,8 @@ function App() {
   }, [osc1Settings]);
 
   const newNote = (rippleSettings, circlesRef) => {
+    // rippleSettings does not need a ref 
+    // a RippleCanvas useEffect creates a new interval to call this method with new values, removing the old one.
     const currentSettings = osc1SettingsRef.current;
     const currentCircles = circlesRef.current;
     new Osc(actx, gain1, currentSettings.frequency, rippleSettings, currentCircles);
