@@ -1,12 +1,12 @@
 export default class Osc {
-  constructor(actx, connection, frequency, rippleSettings) {
+  constructor(actx, connection, frequency, rippleSettings, circles) {
     this.actx = actx;
     this.calculateEnvelope(rippleSettings);
     this.osc = actx.createOscillator();
     this.key = frequency;
-    this.osc.frequency.value = this.calculateFrequency();
+    this.osc.frequency.value = this.calculateFrequency(rippleSettings, circles);
     // slight detune between -.1 and +.1
-    this.osc.detune.value = (Math.random() / 5) - .1;
+    this.osc.detune.value = (Math.random() / 10) - .05;
     this.osc.type = 'sawtooth';
     this.gateGain = actx.createGain();
     this.gateGain.gain.value = 0;
@@ -17,15 +17,44 @@ export default class Osc {
     this.osc.start();
     this.start();
   }
-  calculateFrequency(){
+  calculateFrequency(rippleSettings, circles){
     // unison, octave, fifth, fourth, third, sixth, maj second. 
-    // duplicates at end for to weight certain notes.
-    const intervalsMajor = [1, 2, 3/2, 4/3, 5/4, 5/3, 9/8, 4/3, 3/2, 1, 2, 3/2];
+    // duplicates to weight certain notes.
+    let intervalsMajor = [1, 2, 3/2, 4/3, 5/4, 5/3, 9/8, 4/3, 3/2, 1, 2, 3/2]
+    intervalsMajor = intervalsMajor.sort(function(a,b) { return a - b;});
     const octaveMultiplierList = [0.5, 1, 2];
-    const intervalIndex = Math.floor(Math.random() * intervalsMajor.length);
-    const octaveIndex = Math.floor(Math.random() * octaveMultiplierList.length);
-    const interval = intervalsMajor[intervalIndex];
-    const octaveMultiplier = octaveMultiplierList[octaveIndex];
+    const currentCircle = circles[circles.length - 1];
+    const canvasWidth = 300;
+    const canvasHeight = 200;
+    const widthInterval = canvasWidth / intervalsMajor.length;
+    const heightInterval = canvasHeight / octaveMultiplierList.length;
+    const x = currentCircle.x;
+    const y = currentCircle.y;
+    // x is 0-300 
+    // let's make x correspond to interval and y to octave
+    // x * xMultiplier + b = widthIndex
+    // if x is 0 then we want widthIndex to be 0 
+    // 0 + b = 0 so b = 0. 
+    // if x is in the largest quadrant of the x axis canvasWidth / intervalsMajor.length 
+    // if x is canvasWidth - widthInterval or greater then widthIndex = intervalsMajor.length - 1
+    // (canvasWidth - widthInterval) * xMultiplier = intervalsMajor.length - 1
+    const xMultiplier = (intervalsMajor.length - 1) / (canvasWidth - widthInterval);
+    const widthIndex = Math.floor(x * xMultiplier);
+    // same thing for Y but going to octaveMultiplierList and with canvasHeight and reversed.
+    // y * yMultiplier + b = heightIndex
+    // if y is in the top quadrant of the canvasHeight then we want heightIndex to be 0 cause that's the bottom of the canvas.
+    //  (canvasHeight - heightInterval) * yMultiplier + b = 0
+    // if y is 0 then we want the heightIndex to be the maximum index octaveMultiplierList.length - 1
+    //  0 * yMultiplier + b = octaveMultiplierList.length - 1
+    //  (canvasHeight - heightInterval) * yMultiplier = - b
+    //  (canvasHeight - heightInterval) * yMultiplier = - b
+    const b = octaveMultiplierList.length - 1;
+    //  (canvasHeight - heightInterval) * yMultiplier = -1 * (octaveMultiplierList.length - 1)
+    const yMultiplier = (-1 * (octaveMultiplierList.length - 1)) / (canvasHeight - heightInterval);
+    // round up this time and we need the .abs just because for 0 javascript gives us -0 (lol)
+    const heightIndex = Math.abs(Math.ceil((y * yMultiplier) + b));
+    const interval = intervalsMajor[widthIndex];
+    const octaveMultiplier = octaveMultiplierList[heightIndex];
     let finalFrequency = this.key * interval * octaveMultiplier;
     // console.log('key ' + this.key + ' final frequency ' + finalFrequency);
     return finalFrequency;

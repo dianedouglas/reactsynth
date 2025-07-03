@@ -91,7 +91,7 @@ const RippleCanvas = ({playNote}) => {
       requestRef.current = requestAnimationFrame(animate);
       intervalRef.current = setInterval(() => {
         createRipple();
-        playNote(rippleSettings);
+        playNote(rippleSettings, circlesRef);
       }, (rippleSettings.rainSpeed));
     }
     return () => {
@@ -134,7 +134,7 @@ const RippleCanvas = ({playNote}) => {
     requestRef.current = requestAnimationFrame(animate);
     intervalRef.current = setInterval(() => {
       createRipple();
-      playNote(rippleSettings);
+      playNote(rippleSettings, circlesRef);
     }, (rippleSettings.rainSpeed));
   }
 
