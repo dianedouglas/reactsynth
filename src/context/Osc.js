@@ -1,10 +1,10 @@
 export default class Osc {
-  constructor(actx, connection, frequency, sustain) {
+  constructor(actx, connection, frequency, rippleSettings) {
     this.actx = actx;
     this.envelope = {
       attack: 0.1,
       decay: 0.1,
-      sustain: sustain || 0.6,
+      sustain: 0.6,
       release: 1,
     };
     this.osc = actx.createOscillator();
@@ -17,6 +17,7 @@ export default class Osc {
     this.osc.connect(this.gateGain);
     this.gateGain.connect(connection);
     this.easing = 0.1;
+    console.log(rippleSettings);
     this.osc.start();
     this.start();
   }

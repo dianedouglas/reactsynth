@@ -89,9 +89,9 @@ function App() {
     osc1SettingsRef.current = osc1Settings;
   }, [osc1Settings]);
 
-  const newNote = () => {
+  const newNote = (rippleSettings) => {
     const currentSettings = osc1SettingsRef.current;
-    new Osc(actx, gain1, currentSettings.frequency);
+    new Osc(actx, gain1, currentSettings.frequency, rippleSettings);
   }
 
   return (
