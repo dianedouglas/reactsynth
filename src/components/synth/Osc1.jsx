@@ -14,8 +14,8 @@ export function Osc1({changeSettings, settings, changeFilterSettings, filterSett
 				value={settings.frequency}
 				onChange={changeSettings}>
 			</input>
+			<Filter settings={filterSettings} changeSettings={changeFilterSettings}/>
 		</div>
 	)
 }
 
-			// <Filter settings={filterSettings} changeSettings={changeFilterSettings}/>

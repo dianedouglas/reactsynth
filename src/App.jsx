@@ -56,7 +56,7 @@ function App() {
   const [filterSettings, setFilterSettings] = useState({
     frequency: filter.frequency.value,
     Q: filter.Q.value,
-    type: filter.type
+    type: "lowpass"
   })
 
   const osc1SettingsRef = useRef(osc1Settings);
@@ -76,6 +76,7 @@ function App() {
   const changeFilter = (e) => {
     let {value, id} = e.target;
     filter[id].value = value;
+    console.log('filter ' + value);
     setFilterSettings({...filterSettings, [id]: value})
   }
 
