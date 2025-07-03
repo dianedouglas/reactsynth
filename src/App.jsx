@@ -6,6 +6,7 @@ import './App.css'
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
 import { Osc1 } from './components/synth/Osc1'
+import ReverbControls from './components/synth/Reverb'
 import Osc from './context/Osc'
 import RippleCanvas from './components/RippleCanvas'
 import { get_todos, create_todo, delete_todo } from './api/endpoints'
@@ -17,7 +18,7 @@ let gain1 = actx.createGain();
 let filter = actx.createBiquadFilter();
 osc1.connect(gain1);
 gain1.connect(filter);
-filter.connect(out);
+// filter.connect(out);
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -109,6 +110,11 @@ function App() {
             changeSettings={changeOsc1} 
             filterSettings={filterSettings}
             changeFilterSettings={changeFilter} 
+          />
+          <ReverbControls
+            audioCtx={actx}
+            inputNode={filter}
+            outputNode={actx.destination}
           />
         </div>
       </div>
