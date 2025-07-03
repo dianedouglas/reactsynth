@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-const RippleCanvas = ({playNote}) => {
+const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
   // size of canvas
   const width = 300;
   const height = 200;
@@ -118,9 +118,14 @@ const RippleCanvas = ({playNote}) => {
   };
 
   const changeRippleSettings = (e) => {
-    let {value, id} = e.target;
-    setRippleSettings({...rippleSettings, [id]: value})
-  }
+    let { value, id } = e.target;
+    const numericValue = parseFloat(value);
+    setRippleSettings({ ...rippleSettings, [id]: numericValue });
+
+    if (id === 'rippleSpeed' && onRippleSpeedChange) {
+      onRippleSpeedChange(numericValue); // notify parent to change reverb amount
+    }
+  };
 
   const calculateRainSpeed = (e) => {
     let {value, min, max} = e.target;

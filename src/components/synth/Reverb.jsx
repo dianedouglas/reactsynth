@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 function createReverbBuffer(audioCtx, reverse = false) {
   const sampleRate = audioCtx.sampleRate;
-  const decay = 4.5;
+  const decay = 5;
   const length = sampleRate * decay;
   const impulse = audioCtx.createBuffer(2, length, sampleRate);
   for (let channel = 0; channel < 2; channel++) {
@@ -15,7 +15,7 @@ function createReverbBuffer(audioCtx, reverse = false) {
   return impulse;
 }
 
-const ReverbControls = ({ audioCtx, inputNode, outputNode }) => {
+const ReverbControls = ({ audioCtx, inputNode, outputNode, rippleSpeed }) => {
   const [wetMix, setWetMix] = useState(0.5);
 
   const convolverRef = useRef(null);
@@ -84,21 +84,28 @@ const ReverbControls = ({ audioCtx, inputNode, outputNode }) => {
     }
   }, [wetMix, audioCtx]);
 
+  useEffect(() => {
+    if (!audioCtx || rippleSpeed == null) return;
+
+    const maxSpeed = 100;
+    const minSpeed = 10; // threshold for full reverb
+    const minWet = 0.2;
+    const maxWet = 1.0;
+
+    // Clamp rippleSpeed to [minSpeed, maxSpeed]
+    const clamped = Math.max(minSpeed, Math.min(maxSpeed, rippleSpeed));
+
+    // Map rippleSpeed [10 → 100] to wetMix [1 → 0.2]
+    const t = (clamped - minSpeed) / (maxSpeed - minSpeed); // normalized 0 → 1
+    const scaledWetMix = maxWet - t * (maxWet - minWet);   // interpolated
+
+    setWetMix(scaledWetMix);
+  }, [rippleSpeed, audioCtx]);
+
   return (
-    <div style={{ marginTop: '1rem' }}>
-      <label>
-        Wet/Dry Mix: {(wetMix * 100).toFixed(0)}%
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={wetMix}
-          onChange={(e) => setWetMix(parseFloat(e.target.value))}
-        />
-      </label>
-    </div>
-  );
+  	<>
+  	</>
+  )
 };
 
 export default ReverbControls;

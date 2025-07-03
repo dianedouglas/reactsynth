@@ -60,6 +60,8 @@ function App() {
     type: "lowpass"
   })
 
+  const [rippleSpeed, setRippleSpeed] = useState(25);
+
   const osc1SettingsRef = useRef(osc1Settings);
 
   const changeOsc1 = (e) => {
@@ -104,7 +106,7 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>Rain Synth</h1>
-          <RippleCanvas playNote={newNote}/>
+          <RippleCanvas playNote={newNote} onRippleSpeedChange={setRippleSpeed}/>
           <Osc1 
             settings={osc1Settings}
             changeSettings={changeOsc1} 
@@ -115,6 +117,7 @@ function App() {
             audioCtx={actx}
             inputNode={filter}
             outputNode={actx.destination}
+            rippleSpeed={rippleSpeed}
           />
         </div>
       </div>
