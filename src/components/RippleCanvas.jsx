@@ -169,7 +169,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settin
 
   return (
     <div>
-      <div>
+      <div className="master-controls">
         <button onClick={startRain}>Start</button>
         <button onClick={stopRain}>Stop</button>
       </div>
