@@ -63,6 +63,7 @@ function App() {
   const [rippleSpeed, setRippleSpeed] = useState(25);
 
   const osc1SettingsRef = useRef(osc1Settings);
+  const filterSettingsRef = useRef(filterSettings);
 
   const changeOsc1 = (e) => {
     let {value, id} = e.target;
@@ -79,7 +80,6 @@ function App() {
   const changeFilter = (e) => {
     let {value, id} = e.target;
     filter[id].value = value;
-    console.log('filter ' + value);
     setFilterSettings({...filterSettings, [id]: value})
   }
 
@@ -91,7 +91,8 @@ function App() {
 
   useEffect(() => {
     osc1SettingsRef.current = osc1Settings;
-  }, [osc1Settings]);
+    filterSettingsRef.current = filterSettings;
+  }, [osc1Settings, filterSettings]);
 
   const newNote = (rippleSettings, circlesRef) => {
     // rippleSettings does not need a ref 
@@ -106,7 +107,7 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>Rain Synth</h1>
-          <RippleCanvas playNote={newNote} onRippleSpeedChange={setRippleSpeed}/>
+          <RippleCanvas playNote={newNote} onRippleSpeedChange={setRippleSpeed} filterSettings={filterSettings}/>
           <Osc1 
             settings={osc1Settings}
             changeSettings={changeOsc1} 

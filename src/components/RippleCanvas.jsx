@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
+const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
   // size of canvas
   const width = 300;
   const height = 200;
@@ -32,7 +32,9 @@ const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
     decay: 5,
     rainSpeed: (rainIntervalDisplayDefault * -1) + rainIntervalMin + rainIntervalMax,
     displayRainSpeed: rainIntervalDisplayDefault,
-    isRaining: false
+    isRaining: false,
+    hue: filterSettings.frequency / 5,
+    lightness: filterSettings.Q * 20 + 20
   })
 
   // ---------- ripple constants that do not need sliders ------------
@@ -53,7 +55,9 @@ const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
     circlesRef.current.forEach((circle) => {
       ctx.beginPath();
       ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(0, 150, 255, ${circle.transparency})`;
+      // ctx.strokeStyle = `rgba(0, 150, 255, ${circle.transparency})`;
+      let strokeStyle = `hsla(${rippleSettings.hue}, ${rippleSettings.lightness}%, 50%, ${circle.transparency})`
+      ctx.strokeStyle = strokeStyle;
       ctx.stroke();
 
       // add other circles for echos 
@@ -64,7 +68,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
         echoTransparency = echoTransparency / goldenRatio;
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, echoRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 150, 255, ${echoTransparency})`;
+        ctx.strokeStyle = strokeStyle;
         ctx.stroke();
       }
     });
@@ -100,6 +104,13 @@ const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
     }
   }, [rippleSettings]);
 
+  useEffect(() => {
+    let {frequency, Q} = filterSettings;
+    let freqToHue = frequency / 5;
+    let qToLightness = Q * 20 + 20;
+    setRippleSettings({ ...rippleSettings, hue: freqToHue, lightness: qToLightness });
+  }, [filterSettings.frequency, filterSettings.Q]);
+
   const animate = () => {
     // each animation frame we update the collection of circles so that they get bigger and more transparent
     updateCircles();
@@ -126,6 +137,8 @@ const RippleCanvas = ({playNote, onRippleSpeedChange}) => {
       onRippleSpeedChange(numericValue); // notify parent to change reverb amount
     }
   };
+
+
 
   const calculateRainSpeed = (e) => {
     let {value, min, max} = e.target;
