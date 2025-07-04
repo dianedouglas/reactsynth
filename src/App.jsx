@@ -55,26 +55,17 @@ function App() {
   })
 
   const [filterSettings, setFilterSettings] = useState({
-    frequency: filter.frequency.value,
+    frequency: 589,
     Q: filter.Q.value,
     type: "lowpass"
   })
 
   const [rippleSpeed, setRippleSpeed] = useState(25);
 
-  const osc1SettingsRef = useRef(osc1Settings);
-  const filterSettingsRef = useRef(filterSettings);
-
   const changeOsc1 = (e) => {
     let {value, id} = e.target;
     osc1[id].value = value;
     setOsc1Settings({...osc1Settings, [id]: value})
-  }
-
-  const changeOsc1Type = (e) => {
-    let {id} = e.target;
-    osc1.type = id;
-    setOsc1Settings({...osc1Settings, type: id})
   }
 
   const changeFilter = (e) => {
@@ -83,23 +74,12 @@ function App() {
     setFilterSettings({...filterSettings, [id]: value})
   }
 
-  const changeFilterType = (e) => {
-    let {id} = e.target;
-    filter.type = id;
-    setFilterSettings({...filterSettings, type: id})
-  }
-
-  useEffect(() => {
-    osc1SettingsRef.current = osc1Settings;
-    filterSettingsRef.current = filterSettings;
-  }, [osc1Settings, filterSettings]);
-
-  const newNote = (rippleSettings, circlesRef) => {
+  const newNote = (rippleSettings, circlesRef, osc1SettingsRef) => {
     // rippleSettings does not need a ref 
     // a RippleCanvas useEffect creates a new interval to call this method with new values, removing the old one.
-    const currentSettings = osc1SettingsRef.current;
+    const currentOscSettings = osc1SettingsRef.current;
     const currentCircles = circlesRef.current;
-    new Osc(actx, gain1, currentSettings.frequency, rippleSettings, currentCircles);
+    new Osc(actx, gain1, currentOscSettings.frequency, rippleSettings, currentCircles);
   }
 
   return (
@@ -107,7 +87,12 @@ function App() {
       <div className='App'>
         <div className='app-container'>
           <h1>Rain Synth</h1>
-          <RippleCanvas playNote={newNote} onRippleSpeedChange={setRippleSpeed} filterSettings={filterSettings}/>
+          <RippleCanvas 
+            playNote={newNote} 
+            onRippleSpeedChange={setRippleSpeed} 
+            filterSettings={filterSettings}
+            osc1Settings={osc1Settings}
+          />
           <Osc1 
             settings={osc1Settings}
             changeSettings={changeOsc1} 

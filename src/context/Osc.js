@@ -57,7 +57,6 @@ export default class Osc {
     // lastly, calculate keyFreq from a default lowest frequency.
     const LOWEST_FREQUENCY = 55;
     let keyFreq = LOWEST_FREQUENCY + (LOWEST_FREQUENCY * baseOctave);
-    // console.log(keyFreq);
     let finalFrequency = keyFreq * interval * octaveMultiplier;
     return finalFrequency;
   }

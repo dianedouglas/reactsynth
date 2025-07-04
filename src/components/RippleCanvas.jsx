@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { scaleValue } from '../utils/mathHelpers';
 
-const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
+const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settings}) => {
   // size of canvas
   const width = 300;
   const height = 200;
@@ -20,6 +21,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
   // that way it doesn't continue trying to animate after the component is gone.
   const requestRef = useRef();
   const intervalRef = useRef();
+  const osc1SettingsRef = useRef(osc1Settings);
 
   // ---------- rippleSettings state ------------
   // rippleSpeed: 
@@ -95,7 +97,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
       requestRef.current = requestAnimationFrame(animate);
       intervalRef.current = setInterval(() => {
         createRipple();
-        playNote(rippleSettings, circlesRef);
+        playNote(rippleSettings, circlesRef, osc1SettingsRef);
       }, (rippleSettings.rainSpeed));
     }
     return () => {
@@ -105,9 +107,13 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
   }, [rippleSettings]);
 
   useEffect(() => {
+    osc1SettingsRef.current = osc1Settings;
+  }, [osc1Settings]);
+
+  useEffect(() => {
     let {frequency, Q} = filterSettings;
-    let freqToHue = frequency / 5;
-    let qToLightness = Q * 20 + 20;
+    let freqToHue = scaleValue(frequency, 0, 1000, 0, 360);
+    let qToLightness = scaleValue(Q, 0, 3, 40, 100);
     setRippleSettings({ ...rippleSettings, hue: freqToHue, lightness: qToLightness });
   }, [filterSettings.frequency, filterSettings.Q]);
 
@@ -152,7 +158,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings}) => {
     requestRef.current = requestAnimationFrame(animate);
     intervalRef.current = setInterval(() => {
       createRipple();
-      playNote(rippleSettings, circlesRef);
+      playNote(rippleSettings, circlesRef, osc1SettingsRef);
     }, (rippleSettings.rainSpeed));
   }
 
