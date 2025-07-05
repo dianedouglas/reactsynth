@@ -9,7 +9,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   const goldenRatio = 1.618;
   const rainIntervalMax = 1500;
   const rainIntervalMin = 100;
-  const rainIntervalDisplayDefault = 200;
+  const rainIntervalDisplayDefault = 300;
 
   // ---------- ref objects ------------
   const canvasRef = useRef(null);

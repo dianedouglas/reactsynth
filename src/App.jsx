@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import reactLogo from './assets/react.svg'
 
 import './App.css'
 
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
+
 import { SynthSettings } from './components/synth/SynthSettings'
 import ReverbControls from './components/synth/Reverb'
 import Osc from './context/Osc'
@@ -18,7 +18,6 @@ let gain = actx.createGain();
 let filter = actx.createBiquadFilter();
 osc.connect(gain);
 gain.connect(filter);
-// filter.connect(out);
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -49,8 +48,7 @@ function App() {
   // ************** Audio stuff
 
   const [synthSettings, setSynthSettings] = useState({
-    frequency: 1,
-    type: "sawtooth"
+    octave: 2
   })
 
   const [filterSettings, setFilterSettings] = useState({
@@ -62,11 +60,14 @@ function App() {
   const [rippleSpeed, setRippleSpeed] = useState(25);
 
   const changeSynthSettings = (e) => {
+    // right now this is just used to set the octave for the synth
+    // but other settings could be added by using the correct id and then updating the osc.
+    // synthSettings are passed into the newNote function triggered by new ripples in RippleCanvas
     let {value, id} = e.target;
-    osc[id].value = value;
     setSynthSettings({...synthSettings, [id]: value})
   }
 
+  // update the actual filter instance and then update the filterSettings state.
   const changeFilterSettings = (e) => {
     let {value, id} = e.target;
     filter[id].value = value;
@@ -78,7 +79,7 @@ function App() {
     // a RippleCanvas useEffect creates a new interval to call this method with new values, removing the old one.
     const currentSynthSettings = synthSettingsRef.current;
     const currentCircles = circlesRef.current;
-    new Osc(actx, gain, currentSynthSettings.frequency, rippleSettings, currentCircles);
+    new Osc(actx, gain, currentSynthSettings.octave, rippleSettings, currentCircles);
   }
 
   return (
