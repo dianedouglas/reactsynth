@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { audioCtx, filter as inputNode } from '../../context/audioContext';
 
 function createReverbBuffer(audioCtx, reverse = false) {
   const sampleRate = audioCtx.sampleRate;
@@ -15,7 +16,7 @@ function createReverbBuffer(audioCtx, reverse = false) {
   return impulse;
 }
 
-const ReverbControls = ({ audioCtx, inputNode, outputNode, rippleSpeed }) => {
+const ReverbControls = ({ rippleSpeed }) => {
   const [wetMix, setWetMix] = useState(0.5);
 
   const convolverRef = useRef(null);
@@ -24,7 +25,7 @@ const ReverbControls = ({ audioCtx, inputNode, outputNode, rippleSpeed }) => {
   const outputGainRef = useRef(null);
 
   useEffect(() => {
-    if (!audioCtx || !inputNode || !outputNode) return;
+    if (!audioCtx || !inputNode) return;
 
     const convolver = audioCtx.createConvolver();
     convolver.buffer = createReverbBuffer(audioCtx);
@@ -32,6 +33,7 @@ const ReverbControls = ({ audioCtx, inputNode, outputNode, rippleSpeed }) => {
     const wetGain = audioCtx.createGain();
     const dryGain = audioCtx.createGain();
     const outputGain = audioCtx.createGain();
+    const outputNode = audioCtx.destination;
 
     wetGain.gain.value = wetMix;
     dryGain.gain.value = 1 - wetMix;
@@ -59,7 +61,7 @@ const ReverbControls = ({ audioCtx, inputNode, outputNode, rippleSpeed }) => {
       dryGain.disconnect();
       outputGain.disconnect();
     };
-  }, [audioCtx, inputNode, outputNode]);
+  }, [audioCtx, inputNode]);
 
   // Smoothly update gains on wetMix change
   useEffect(() => {

@@ -10,14 +10,7 @@ import ReverbControls from './components/synth/Reverb'
 import Osc from './context/Osc'
 import RippleCanvas from './components/RippleCanvas'
 import { get_todos, create_todo, delete_todo } from './api/endpoints'
-
-let actx = new AudioContext();
-let out = actx.destination;
-let osc = actx.createOscillator();
-let gain = actx.createGain();
-let filter = actx.createBiquadFilter();
-osc.connect(gain);
-gain.connect(filter);
+import { audioCtx, gain, filter } from './context/audioContext';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -79,7 +72,7 @@ function App() {
     // a RippleCanvas useEffect creates a new interval to call this method with new values, removing the old one.
     const currentSynthSettings = synthSettingsRef.current;
     const currentCircles = circlesRef.current;
-    new Osc(actx, gain, currentSynthSettings.octave, rippleSettings, currentCircles);
+    new Osc(audioCtx, gain, currentSynthSettings.octave, rippleSettings, currentCircles);
   }
 
   return (
@@ -99,12 +92,7 @@ function App() {
             filterSettings={filterSettings}
             changeFilterSettings={changeFilterSettings} 
           />
-          <ReverbControls
-            audioCtx={actx}
-            inputNode={filter}
-            outputNode={actx.destination}
-            rippleSpeed={rippleSpeed}
-          />
+          <ReverbControls rippleSpeed={rippleSpeed}/>
         </div>
       </div>
     </>
