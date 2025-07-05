@@ -1,6 +1,6 @@
 import { Filter } from './Filter'
 
-export function Osc1({changeSettings, settings, changeFilterSettings, filterSettings}){
+export function SynthSettings({changeSynthSettings, synthSettings, changeFilterSettings, filterSettings}){
 	return (
 		<div>
 			<label htmlFor="frequency">Octave</label>
@@ -11,8 +11,8 @@ export function Osc1({changeSettings, settings, changeFilterSettings, filterSett
 				min="0"
 				max="3"
 				step="1"
-				value={settings.frequency}
-				onChange={changeSettings}>
+				value={synthSettings.frequency}
+				onChange={changeSynthSettings}>
 			</input>
 			<Filter settings={filterSettings} changeSettings={changeFilterSettings}/>
 		</div>

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
 
-const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settings}) => {
+const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSettings}) => {
   // size of canvas
   const width = 300;
   const height = 200;
@@ -21,7 +21,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settin
   // that way it doesn't continue trying to animate after the component is gone.
   const requestRef = useRef();
   const intervalRef = useRef();
-  const osc1SettingsRef = useRef(osc1Settings);
+  const synthSettingsRef = useRef(synthSettings);
 
   // ---------- rippleSettings state ------------
   // rippleSpeed: 
@@ -48,13 +48,13 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settin
   const numberOfEchoes = 10;
 
   // need these two useEffects to update state when audio settings change.
-  // osc1Settings and filterSettings are coming from the separate oscillator and filter components.
-  // Each ripple created in RippleCanvas triggers a note, so we have to pass it the most up to date version of oscillator settings.
+  // synthSettings and filterSettings are coming from the separate synth and filter components.
+  // Each ripple created in RippleCanvas triggers a note, so we have to pass it the most up to date version of synth settings.
   // and the filter settings control the colors of the ripples 
   // so we need to update the rippleSettings state when filterSettings changes, which also causes the RippleCanvas to re-render.
   useEffect(() => {
-    osc1SettingsRef.current = osc1Settings;
-  }, [osc1Settings]);
+    synthSettingsRef.current = synthSettings;
+  }, [synthSettings]);
 
   useEffect(() => {
     let {frequency, Q} = filterSettings;
@@ -129,7 +129,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settin
       requestRef.current = requestAnimationFrame(animate);
       intervalRef.current = setInterval(() => {
         createRipple();
-        playNote(rippleSettings, circlesRef, osc1SettingsRef);
+        playNote(rippleSettings, circlesRef, synthSettingsRef);
       }, (rippleSettings.rainSpeed));
     }
     return () => {
@@ -156,7 +156,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, osc1Settin
     requestRef.current = requestAnimationFrame(animate);
     intervalRef.current = setInterval(() => {
       createRipple();
-      playNote(rippleSettings, circlesRef, osc1SettingsRef);
+      playNote(rippleSettings, circlesRef, synthSettingsRef);
     }, (rippleSettings.rainSpeed));
   }
 

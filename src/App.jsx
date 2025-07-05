@@ -5,7 +5,7 @@ import './App.css'
 
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
-import { Osc1 } from './components/synth/Osc1'
+import { SynthSettings } from './components/synth/SynthSettings'
 import ReverbControls from './components/synth/Reverb'
 import Osc from './context/Osc'
 import RippleCanvas from './components/RippleCanvas'
@@ -13,11 +13,11 @@ import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
 let actx = new AudioContext();
 let out = actx.destination;
-let osc1 = actx.createOscillator();
-let gain1 = actx.createGain();
+let osc = actx.createOscillator();
+let gain = actx.createGain();
 let filter = actx.createBiquadFilter();
-osc1.connect(gain1);
-gain1.connect(filter);
+osc.connect(gain);
+gain.connect(filter);
 // filter.connect(out);
 
 function App() {
@@ -48,10 +48,10 @@ function App() {
 
   // ************** Audio stuff
 
-  const [osc1Settings, setOsc1Settings] = useState({
+  const [synthSettings, setSynthSettings] = useState({
     frequency: 1,
-    detune: osc1.detune.value,
-    type: osc1.type
+    detune: osc.detune.value,
+    type: osc.type
   })
 
   const [filterSettings, setFilterSettings] = useState({
@@ -62,24 +62,24 @@ function App() {
 
   const [rippleSpeed, setRippleSpeed] = useState(25);
 
-  const changeOsc1 = (e) => {
+  const changeSynthSettings = (e) => {
     let {value, id} = e.target;
-    osc1[id].value = value;
-    setOsc1Settings({...osc1Settings, [id]: value})
+    osc[id].value = value;
+    setSynthSettings({...synthSettings, [id]: value})
   }
 
-  const changeFilter = (e) => {
+  const changeFilterSettings = (e) => {
     let {value, id} = e.target;
     filter[id].value = value;
     setFilterSettings({...filterSettings, [id]: value})
   }
 
-  const newNote = (rippleSettings, circlesRef, osc1SettingsRef) => {
+  const newNote = (rippleSettings, circlesRef, synthSettingsRef) => {
     // rippleSettings does not need a ref 
     // a RippleCanvas useEffect creates a new interval to call this method with new values, removing the old one.
-    const currentOscSettings = osc1SettingsRef.current;
+    const currentSynthSettings = synthSettingsRef.current;
     const currentCircles = circlesRef.current;
-    new Osc(actx, gain1, currentOscSettings.frequency, rippleSettings, currentCircles);
+    new Osc(actx, gain, currentSynthSettings.frequency, rippleSettings, currentCircles);
   }
 
   return (
@@ -91,13 +91,13 @@ function App() {
             playNote={newNote} 
             onRippleSpeedChange={setRippleSpeed} 
             filterSettings={filterSettings}
-            osc1Settings={osc1Settings}
+            synthSettings={synthSettings}
           />
-          <Osc1 
-            settings={osc1Settings}
-            changeSettings={changeOsc1} 
+          <SynthSettings 
+            synthSettings={synthSettings}
+            changeSynthSettings={changeSynthSettings} 
             filterSettings={filterSettings}
-            changeFilterSettings={changeFilter} 
+            changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls
             audioCtx={actx}
