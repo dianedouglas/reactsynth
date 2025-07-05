@@ -50,8 +50,7 @@ function App() {
 
   const [synthSettings, setSynthSettings] = useState({
     frequency: 1,
-    detune: osc.detune.value,
-    type: osc.type
+    type: "sawtooth"
   })
 
   const [filterSettings, setFilterSettings] = useState({
