@@ -1,4 +1,13 @@
-export function scaleValue(inputValue, minInput, maxInput, minOutput, maxOutput) {
+export function scaleValue(inputValue, minInput, maxInput, minOutput, maxOutput, clamp = false) {
+  let optionallyClampedInput = inputValue;
+  if (clamp){
+    if (inputValue < minInput) {
+      optionallyClampedInput = minInput;
+    }
+    if (inputValue > maxInput) {
+      optionallyClampedInput = maxInput;
+    }
+  }
   // scale input to 0 -> 1.
   // say current value is 30 with input range of 0 - 100. 
   // (30 - 0) / 100 = .3 
@@ -6,7 +15,7 @@ export function scaleValue(inputValue, minInput, maxInput, minOutput, maxOutput)
   // (50 - 20) / 100 = .3 as well. 
   // gives us a measurement of how high in the given range the input is scaled from 0 to 1.
   const rangeOfInputValues = maxInput - minInput;
-  const scaledInput = (inputValue - minInput) / rangeOfInputValues;
+  const scaledInput = (optionallyClampedInput - minInput) / rangeOfInputValues;
   
   // This we can scale to output range
   // maxOutput - minOutput gives the desired range. Say 1000. 

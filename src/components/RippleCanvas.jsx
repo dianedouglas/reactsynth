@@ -1,10 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
+import * as CONFIG from '../utils/constants';
 
 const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSettings}) => {
-  // size of canvas
-  const width = 300;
-  const height = 200;
   // used for calculating how ripples dissipate
   const goldenRatio = 1.618;
   const rainIntervalMax = 1500;
@@ -68,7 +66,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
 
     circlesRef.current.forEach((circle) => {
       drawCircle(ctx, circle.x, circle.y, circle.radius, rippleSettings.hue, rippleSettings.lightness, circle.transparency);
@@ -142,10 +140,8 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   // timing of interval is set with rippleSettings.rainSpeed
   // every time a ripple is created a note is played.
   const createRipple = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const x = Math.floor(Math.random() * canvas.width);
-    const y = Math.floor(Math.random() * canvas.height);
+    const x = Math.floor(Math.random() * CONFIG.CANVAS_WIDTH);
+    const y = Math.floor(Math.random() * CONFIG.CANVAS_HEIGHT);
     circlesRef.current.push({ x, y, radius: 1.0, transparency: 1.0 });
   };
 
@@ -189,7 +185,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
         <button onClick={startRain}>Start</button>
         <button onClick={stopRain}>Stop</button>
       </div>
-      <canvas ref={canvasRef} width={width} height={height} style={{ border: '1px solid black' }} />
+      <canvas ref={canvasRef} width={CONFIG.CANVAS_WIDTH} height={CONFIG.CANVAS_HEIGHT} style={{ border: '1px solid black' }} />
       <div>
         <label htmlFor="rippleSpeed">Speed</label>
         <input 
