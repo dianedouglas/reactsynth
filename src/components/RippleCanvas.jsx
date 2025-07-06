@@ -31,8 +31,8 @@ export function RippleCanvas({playNote, onRippleSpeedChange, filterSettings, syn
     rainSpeed: scaleValue(rainIntervalDisplayDefault, rainIntervalMin, rainIntervalMax, rainIntervalMax, rainIntervalMin),
     displayRainSpeed: rainIntervalDisplayDefault,
     isRaining: false,
-    hue: filterSettings.frequency / 5,
-    lightness: filterSettings.Q * 20 + 20
+    hue: scaleValue(filterSettings.frequency, 0, 1000, 0, 360),
+    lightness: scaleValue(filterSettings.Q, 0, 3, 40, 100)
   })
   // ---------- ref objects ------------
 
@@ -59,11 +59,10 @@ export function RippleCanvas({playNote, onRippleSpeedChange, filterSettings, syn
   const transparencyThreshold = 0.04;
   const numberOfEchoes = 10;
 
-  // need these two useEffects to update state when audio settings change.
   // synthSettings and filterSettings are coming from the separate synth and filter components.
   // Each ripple created in RippleCanvas triggers a note, so we have to pass it the most up to date version of synth settings.
   // and the filter settings control the colors of the ripples 
-  // so we need to update the rippleSettings state when filterSettings changes, which also causes the RippleCanvas to re-render.
+  // so we need to update the rippleSettings state when filterSettings changes
   useEffect(() => {
     synthSettingsRef.current = synthSettings;
   }, [synthSettings]);
