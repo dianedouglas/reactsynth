@@ -4,12 +4,12 @@ import './App.css'
 
 import { TodoList } from './components/TodoList'
 import { CreateTodo } from './components/CreateTodo'
+import { get_todos, create_todo, delete_todo } from './api/endpoints'
 
 import { SynthSettings } from './components/synth/SynthSettings'
-import ReverbControls from './components/synth/Reverb'
-import Osc from './context/Osc'
-import RippleCanvas from './components/RippleCanvas'
-import { get_todos, create_todo, delete_todo } from './api/endpoints'
+import { ReverbControls } from './components/synth/Reverb'
+import { Osc } from './context/Osc'
+import { RippleCanvas } from './components/RippleCanvas'
 import { audioCtx, gain, filter } from './context/audioContext';
 
 function App() {
@@ -57,14 +57,14 @@ function App() {
     // but other settings could be added by using the correct id and then updating the osc.
     // synthSettings are passed into the newNote function triggered by new ripples in RippleCanvas
     let {value, id} = e.target;
-    setSynthSettings({...synthSettings, [id]: value})
+    setSynthSettings(prev => ({ ...prev, [id]: value }));
   }
 
   // update the actual filter instance and then update the filterSettings state.
   const changeFilterSettings = (e) => {
-    let {value, id} = e.target;
+    const { value, id } = e.target;
     filter[id].value = value;
-    setFilterSettings({...filterSettings, [id]: value})
+    setFilterSettings(prev => ({ ...prev, [id]: value }));
   }
 
   const newNote = (rippleSettings, circlesRef, synthSettingsRef) => {

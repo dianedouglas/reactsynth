@@ -1,7 +1,7 @@
 import { scaleValue } from '../utils/mathHelpers';
 import * as CONFIG from '../utils/constants';
 
-export default class Osc {
+export class Osc {
 
   static LOWEST_FREQUENCY = 55;
 

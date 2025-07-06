@@ -16,7 +16,7 @@ function createReverbBuffer(audioCtx, reverse = false) {
   return impulse;
 }
 
-const ReverbControls = ({ rippleSpeed }) => {
+export function ReverbControls({ rippleSpeed }){
   const [wetMix, setWetMix] = useState(0.5);
 
   const convolverRef = useRef(null);
@@ -110,4 +110,3 @@ const ReverbControls = ({ rippleSpeed }) => {
   )
 };
 
-export default ReverbControls;

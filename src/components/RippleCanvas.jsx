@@ -2,24 +2,12 @@ import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
 import * as CONFIG from '../utils/constants';
 
-const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSettings}) => {
+export function RippleCanvas({playNote, onRippleSpeedChange, filterSettings, synthSettings}){
   // used for calculating how ripples dissipate
   const goldenRatio = 1.618;
   const rainIntervalMax = 1500;
   const rainIntervalMin = 100;
   const rainIntervalDisplayDefault = 300;
-
-  // ---------- ref objects ------------
-  const canvasRef = useRef(null);
-  // this holds the current set of circles in a mutable variable 
-  // allows us to animate without rerendering the component on every frame when circles updates.
-  const circlesRef = useRef([]); 
-  // this holds the most recent animation frame's ID returned on each request
-  // when the component unmounts we can call cancelAnimationFrame at the end of useEffect 
-  // that way it doesn't continue trying to animate after the component is gone.
-  const requestRef = useRef();
-  const intervalRef = useRef();
-  const synthSettingsRef = useRef(synthSettings);
 
   // ---------- rippleSettings state ------------
   // rippleSpeed: 
@@ -27,6 +15,16 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   // decay: 
   //   circle's transparency is multiplied by the decay on each animation frame.
   //   when each circle's transparency gets below the threshold it is removed from the array and no longer drawn.
+  // rainSpeed:
+  //   milliseconds between raindrops (setInterval). each raindrop also triggers a new note with playNote.
+  // displayRainSpeed: 
+  //   used for the slider controlling amount of rain because it is an inverse display. highest slider value = fastest rain.
+  // isRaining:
+  //   starts false and is set to true by start button, back to false with stop button. Web audio api requires user gesture.
+  // hue: 
+  //   color of ripples, governed by frequency of filter in the filter component..
+  // lightness:
+  //   lightness of the color of ripples (hsla) governed by the Q of the filter.
   const [rippleSettings, setRippleSettings] = useState({
     rippleSpeed: 25,
     decay: 5,
@@ -36,6 +34,22 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
     hue: filterSettings.frequency / 5,
     lightness: filterSettings.Q * 20 + 20
   })
+  // ---------- ref objects ------------
+
+  // need ref of rippleSettings and synthSettings for up to date values in setInterval and requestAnimationFrame
+  const rippleSettingsRef = useRef(rippleSettings);
+  const synthSettingsRef = useRef(synthSettings);
+  // holds actual canvas object. don't want to rerender it. 
+  const canvasRef = useRef(null);
+  // this holds the current set of circles in a mutable variable 
+  // allows us to animate without rerendering the component on every frame when circles updates.
+  const circlesRef = useRef([]); 
+  // requestRef holds the most recent animation frame's ID returned on each request
+  // when the component unmounts we can call cancelAnimationFrame at the end of useEffect 
+  // that way it doesn't continue trying to animate after the component is gone.
+  // similarly intervalRef holds the returned value from setInterval so that it can be cancelled and restarted with a new speed when rainSpeed changes.
+  const requestRef = useRef();
+  const intervalRef = useRef();
 
   // ---------- ripple constants that do not need sliders ------------
   // transparencyThreshold
@@ -55,10 +69,19 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   }, [synthSettings]);
 
   useEffect(() => {
-    let {frequency, Q} = filterSettings;
-    let freqToHue = scaleValue(frequency, 0, 1000, 0, 360);
-    let qToLightness = scaleValue(Q, 0, 3, 40, 100);
-    setRippleSettings({ ...rippleSettings, hue: freqToHue, lightness: qToLightness });
+    rippleSettingsRef.current = rippleSettings;
+  }, [rippleSettings]);
+
+  useEffect(() => {
+    const { frequency, Q } = filterSettings;
+    const freqToHue = scaleValue(frequency, 0, 1000, 0, 360);
+    const qToLightness = scaleValue(Q, 0, 3, 40, 100);
+
+    setRippleSettings(prev => ({
+      ...prev,
+      hue: freqToHue,
+      lightness: qToLightness
+    }));
   }, [filterSettings.frequency, filterSettings.Q]);
 
   // animation loop functions. Every animation frame we draw ripples and then update the collection of circles.
@@ -69,7 +92,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
     ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
 
     circlesRef.current.forEach((circle) => {
-      drawCircle(ctx, circle.x, circle.y, circle.radius, rippleSettings.hue, rippleSettings.lightness, circle.transparency);
+      drawCircle(ctx, circle.x, circle.y, circle.radius, rippleSettingsRef.current.hue, rippleSettingsRef.current.lightness, circle.transparency);
 
       // add other circles for echos 
       let echoRadius = circle.radius;
@@ -77,7 +100,7 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
       for (var i = 0; i < numberOfEchoes; i++) {
         echoRadius = echoRadius / goldenRatio;
         echoTransparency = echoTransparency / goldenRatio;
-        drawCircle(ctx, circle.x, circle.y, echoRadius, rippleSettings.hue, rippleSettings.lightness, echoTransparency);
+        drawCircle(ctx, circle.x, circle.y, echoRadius, rippleSettingsRef.current.hue, rippleSettingsRef.current.lightness, echoTransparency);
       }
     });
   };
@@ -100,8 +123,8 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
       .map((circle) => {
         if (circle.transparency > transparencyThreshold) {
           return { ...circle, 
-            radius: circle.radius + 0.04 + rippleSettings.rippleSpeed / 100, 
-            transparency: circle.transparency * (rippleSettings.decay * 0.0032 + 0.98)
+            radius: circle.radius + 0.04 + rippleSettingsRef.current.rippleSpeed / 100, 
+            transparency: circle.transparency * (rippleSettingsRef.current.decay * 0.0032 + 0.98)
           };
         } else {
           return null; // remove this circle when it gets more transparent than the threshold.
@@ -127,14 +150,14 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
       requestRef.current = requestAnimationFrame(animate);
       intervalRef.current = setInterval(() => {
         createRipple();
-        playNote(rippleSettings, circlesRef, synthSettingsRef);
-      }, (rippleSettings.rainSpeed));
+        playNote(rippleSettingsRef.current, circlesRef, synthSettingsRef);
+      }, (rippleSettingsRef.current.rainSpeed));
     }
     return () => {
       clearInterval(intervalRef.current);
       cancelAnimationFrame(requestRef.current);
     }
-  }, [rippleSettings]);
+  }, [rippleSettings.isRaining, rippleSettings.rainSpeed]);
 
   // ripples are created on an interval that is started at the same time as animation initiated.
   // timing of interval is set with rippleSettings.rainSpeed
@@ -148,11 +171,11 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   // ---------- Functions Triggered By UI ------------
   // want to be able to start an stop both animation and sound with a user gesture (required by web audio api)
   const startRain = () => {
-    setRippleSettings({...rippleSettings, isRaining: true})
+    setRippleSettings(prev => ({ ...prev, isRaining: true }));
     requestRef.current = requestAnimationFrame(animate);
     intervalRef.current = setInterval(() => {
       createRipple();
-      playNote(rippleSettings, circlesRef, synthSettingsRef);
+      playNote(rippleSettingsRef.current, circlesRef, synthSettingsRef);
     }, (rippleSettings.rainSpeed));
   }
 
@@ -165,14 +188,14 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
   const calculateRainSpeed = (e) => {
     let {value} = e.target;
     let invertedValue = scaleValue(value, rainIntervalMin, rainIntervalMax, rainIntervalMax, rainIntervalMin);
-    setRippleSettings({...rippleSettings, rainSpeed: invertedValue, displayRainSpeed: value})
+    setRippleSettings(prev => ({ ...prev, rainSpeed: invertedValue, displayRainSpeed: value }));
   }
 
   // triggered by moving any other component sliders
   const changeRippleSettings = (e) => {
     let { value, id } = e.target;
     const numericValue = parseFloat(value);
-    setRippleSettings({ ...rippleSettings, [id]: numericValue });
+    setRippleSettings(prev => ({ ...prev, [id]: numericValue }));
 
     if (id === 'rippleSpeed' && onRippleSpeedChange) {
       onRippleSpeedChange(numericValue); // notify parent to change reverb amount
@@ -226,5 +249,3 @@ const RippleCanvas = ({playNote, onRippleSpeedChange, filterSettings, synthSetti
     </div>
   );
 };
-
-export default RippleCanvas;
