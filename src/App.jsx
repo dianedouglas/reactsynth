@@ -92,8 +92,6 @@ function App() {
     lightness: scaleValue(filterSettings.Q, 0, 3, 40, 100)
   })
 
-  const [rippleSpeed, setRippleSpeed] = useState(25);
-
   const changeSynthSettings = (e) => {
     // right now this is just used to set the octave for the synth
     // but other settings could be added by using the correct id and then updating the osc.
@@ -147,8 +145,7 @@ function App() {
           <PresetList presetData={presets} propogatePreset={propogatePreset}/>
           <h1>Rain Synth</h1>
           <RippleCanvas 
-            playNote={newNote} 
-            onRippleSpeedChange={setRippleSpeed} 
+            playNote={newNote}
             filterSettings={filterSettings}
             synthSettings={synthSettings}
             rippleSettings={rippleSettings}
@@ -160,7 +157,7 @@ function App() {
             filterSettings={filterSettings}
             changeFilterSettings={changeFilterSettings} 
           />
-          <ReverbControls rippleSpeed={rippleSpeed}/>
+          <ReverbControls rippleSettings={rippleSettings}/>
         </div>
       </div>
     </>

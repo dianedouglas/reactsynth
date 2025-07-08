@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { audioCtx, filter as inputNode } from '../../context/audioContext';
+import { scaleValue } from '../../utils/mathHelpers';
 
 function createReverbBuffer(audioCtx, reverse = false) {
   const sampleRate = audioCtx.sampleRate;
@@ -16,7 +17,7 @@ function createReverbBuffer(audioCtx, reverse = false) {
   return impulse;
 }
 
-export function ReverbControls({ rippleSpeed }){
+export function ReverbControls({ rippleSettings }){
   const [wetMix, setWetMix] = useState(0.5);
 
   const convolverRef = useRef(null);
@@ -87,7 +88,7 @@ export function ReverbControls({ rippleSpeed }){
   }, [wetMix, audioCtx]);
 
   useEffect(() => {
-    if (!audioCtx || rippleSpeed == null) return;
+    if (!audioCtx) return;
 
     const maxSpeed = 100;
     const minSpeed = 10; // threshold for full reverb
@@ -95,14 +96,14 @@ export function ReverbControls({ rippleSpeed }){
     const maxWet = 1.0;
 
     // Clamp rippleSpeed to [minSpeed, maxSpeed]
-    const clamped = Math.max(minSpeed, Math.min(maxSpeed, rippleSpeed));
+    const clamped = Math.max(minSpeed, Math.min(maxSpeed, rippleSettings.rippleSpeed));
 
     // Map rippleSpeed [10 → 100] to wetMix [1 → 0.2]
     const t = (clamped - minSpeed) / (maxSpeed - minSpeed); // normalized 0 → 1
     const scaledWetMix = maxWet - t * (maxWet - minWet);   // interpolated
 
     setWetMix(scaledWetMix);
-  }, [rippleSpeed, audioCtx]);
+  }, [rippleSettings.rippleSpeed, audioCtx]);
 
   return (
   	<>

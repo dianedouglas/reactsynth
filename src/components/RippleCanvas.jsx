@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
 import * as CONFIG from '../utils/constants';
 
-export function RippleCanvas({playNote, onRippleSpeedChange, filterSettings, synthSettings, rippleSettings, setRippleSettings}){
+export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSettings, setRippleSettings}){
   // used for calculating how ripples dissipate
   const goldenRatio = 1.618;
   const rainIntervalMax = 1500;
@@ -162,10 +162,6 @@ export function RippleCanvas({playNote, onRippleSpeedChange, filterSettings, syn
     let { value, id } = e.target;
     const numericValue = parseFloat(value);
     setRippleSettings({ ...rippleSettingsRef.current, [id]: numericValue });
-
-    if (id === 'rippleSpeed' && onRippleSpeedChange) {
-      onRippleSpeedChange(numericValue); // notify parent to change reverb amount
-    }
   };
 
   return (
