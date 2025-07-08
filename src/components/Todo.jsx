@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FiDelete } from "react-icons/fi";
-import { update_todo } from '../api/endpoints'
+import { update_preset } from '../api/endpoints'
 
 
 export function Todo({id, title, completed, deleteTodo}){
