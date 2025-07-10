@@ -164,7 +164,7 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
           name="rippleSpeed" 
           max="100"
           step="0.01"
-          value={rippleSettingsRef.current.rippleSpeed}
+          value={rippleSettings.rippleSpeed}
           onChange={changeRippleSettings}>
         </input>
       </div>
@@ -176,7 +176,7 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
           name="decay" 
           max="10"
           step="0.01"
-          value={rippleSettingsRef.current.decay}
+          value={rippleSettings.decay}
           onChange={changeRippleSettings}>
         </input>
       </div>
@@ -189,7 +189,7 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
           min={rainIntervalMin}
           max={rainIntervalMax}
           step="20"
-          value={rippleSettingsRef.current.displayRainSpeed}
+          value={rippleSettings.displayRainSpeed}
           onChange={calculateRainSpeed}>
         </input>
       </div>
