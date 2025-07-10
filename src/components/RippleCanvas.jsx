@@ -30,15 +30,7 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
   }, [synthSettings]);
 
   useEffect(() => {
-    const { frequency, Q } = filterSettings;
-    const freqToHue = scaleValue(frequency, 0, 1000, 0, 360);
-    const qToLightness = scaleValue(Q, 0, 3, 40, 100);
-
-    setRippleSettings(prev => ({
-      ...prev,
-      hue: freqToHue,
-      lightness: qToLightness,
-    }));
+    filterSettingsRef.current = filterSettings;
   }, [filterSettings]);
 
   // Start animation loop on render if the start button has been pressed, 
@@ -66,9 +58,10 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
-
+    let hue = scaleValue(filterSettingsRef.current.frequency, 0, 1000, 0, 360);
+    let lightness = scaleValue(filterSettingsRef.current.Q, 0, 3, 40, 100);
     circlesRef.current.forEach((circle) => {
-      drawCircle(ctx, circle.x, circle.y, circle.radius, rippleSettingsRef.current.hue, rippleSettingsRef.current.lightness, circle.transparency);
+      drawCircle(ctx, circle.x, circle.y, circle.radius, hue, lightness, circle.transparency);
 
       // add other circles for echos 
       let echoRadius = circle.radius;
@@ -76,7 +69,7 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
       for (var i = 0; i < numberOfEchoes; i++) {
         echoRadius = echoRadius / goldenRatio;
         echoTransparency = echoTransparency / goldenRatio;
-        drawCircle(ctx, circle.x, circle.y, echoRadius, rippleSettingsRef.current.hue, rippleSettingsRef.current.lightness, echoTransparency);
+        drawCircle(ctx, circle.x, circle.y, echoRadius, hue, lightness, echoTransparency);
       }
     });
   };

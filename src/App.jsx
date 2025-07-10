@@ -122,6 +122,9 @@ function App() {
       frequency: currentPreset.filter_frequency,
       Q: currentPreset.filter_q
     }));
+    // update the actual filter node as well.
+    filter.frequency.value = currentPreset.filter_frequency;
+    filter.Q.value = currentPreset.filter_q;
     setSynthSettings(prev => ({ 
       ...prev, 
       octave: currentPreset.octave,
