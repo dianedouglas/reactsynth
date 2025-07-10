@@ -131,7 +131,7 @@ function App() {
       rippleSpeed: currentPreset.ripple_speed,
       decay: currentPreset.ripple_sustain,
       displayRainSpeed: currentPreset.amount_of_rain,
-      displayRainSpeed: scaleValue(currentPreset.amount_of_rain, rainIntervalMin, rainIntervalMax, rainIntervalMax, rainIntervalMin),
+      rainSpeed: scaleValue(currentPreset.amount_of_rain, rainIntervalMin, rainIntervalMax, rainIntervalMax, rainIntervalMin),
       hue: scaleValue(currentPreset.filter_frequency, 0, 1000, 0, 360),
       lightness: scaleValue(currentPreset.filter_q, 0, 3, 40, 100)
     }));
