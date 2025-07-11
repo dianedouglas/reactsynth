@@ -1,24 +1,101 @@
 import { useState } from 'react';
+import { styled, alpha } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
+// StyledMenu copied from MUI docs
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color: 'rgb(55, 65, 81)',
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, ' +
+      'rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, ' +
+      'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, ' +
+      'rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+    },
+    '& .MuiMenuItem-root': {
+      '&:active': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          theme.palette.action.selectedOpacity
+        ),
+      },
+    },
+  },
+}));
 
 export function PresetList({ presetData, propogatePreset }) {
-  // Initialize with the first preset's id if available
+  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOption, setSelectedOption] = useState(presetData[0]?.id || '');
+  const open = Boolean(anchorEl);
 
-  const handleChange = (e) => {
-    const selectedId = e.target.value;
-    setSelectedOption(selectedId); // update local state
-    propogatePreset(selectedId);   // call parent with selected id
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
+  const handleClose = (presetId) => {
+    setAnchorEl(null);
+    if (presetId && presetId !== selectedOption) {
+      setSelectedOption(presetId);
+      propogatePreset(presetId);
+    }
+  };
+
+  const selectedTitle = presetData.find(p => p.id === selectedOption)?.title || 'Presets';
+
   return (
-    <div>
-      <select onChange={handleChange} value={selectedOption}>
-        {presetData.map(preset => (
-          <option key={preset.id} value={preset.id}>
+    <div className="top-of-preset-form">
+      <Button
+        id="preset-button"
+        aria-controls={open ? 'preset-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        variant="contained"
+        disableElevation
+        onClick={handleClick}
+        endIcon={<KeyboardArrowDownIcon />}
+      >
+        {selectedTitle}
+      </Button>
+      <StyledMenu
+        id="preset-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => handleClose(null)}
+        MenuListProps={{
+          'aria-labelledby': 'preset-button',
+        }}
+      >
+        {presetData.map((preset) => (
+          <MenuItem
+            key={preset.id}
+            selected={preset.id === selectedOption}
+            onClick={() => handleClose(preset.id)}
+          >
             {preset.title}
-          </option>
+          </MenuItem>
         ))}
-      </select>
+      </StyledMenu>
     </div>
   );
 }

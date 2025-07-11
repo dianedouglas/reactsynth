@@ -144,8 +144,6 @@ function App() {
     <>
       <div className='App'>
         <div className='app-container'>
-          <CreatePreset add_preset={createPreset}/>
-          <PresetList presetData={presets} propogatePreset={propogatePreset}/>
           <h1>Rain Synth</h1>
           <RippleCanvas 
             playNote={newNote}
@@ -161,6 +159,8 @@ function App() {
             changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls rippleSettings={rippleSettings}/>
+          <PresetList presetData={presets} propogatePreset={propogatePreset}/>
+          <CreatePreset add_preset={createPreset}/>
         </div>
       </div>
     </>

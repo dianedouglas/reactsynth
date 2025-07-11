@@ -1,18 +1,45 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
-export function CreatePreset({add_preset}){
+export function CreatePreset({ add_preset }) {
+  const [name, setName] = useState('');
+  const [hasError, setHasError] = useState(false);
 
-	const [name, setName] = useState('')
+  const handleClick = () => {
+    const trimmedName = name.trim();
 
-	const handleClick = () => {
-		add_preset(name)
-		setName('')
-	}
+    if (trimmedName === '') {
+      setHasError(true);
+      return; // Don't proceed if input is empty or just spaces
+    }
 
-	return (
-		<div>
-			<input value={name} onChange={(e)=> setName(e.target.value)} type="text" />
-			<button onClick={handleClick}> Save New Preset </button>
-		</div>
-	)
+    add_preset(trimmedName);
+    setName('');
+    setHasError(false);
+  };
+
+  return (
+    <div className="form">
+      <TextField
+        id="preset-name"
+        label="Name Your Preset"
+        variant="filled"
+        size="small"
+        value={name}
+        onChange={(e) => {
+          setName(e.target.value);
+          if (hasError) setHasError(false); // Clear error on change
+        }}
+        error={hasError}
+        helperText={hasError ? 'This field is required' : ''}
+        required
+        type="text"
+        focused
+      />
+      <Button onClick={handleClick} variant="contained" size="large">
+        Save New Preset
+      </Button>
+    </div>
+  );
 }
