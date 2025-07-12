@@ -36,8 +36,6 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
   // Start animation loop on render if the start button has been pressed, 
   // then continue it in the background
   useEffect(() => {
-    console.log('rippleSettings changed');
-    console.log(rippleSettings);
     rippleSettingsRef.current = rippleSettings;
     if(rippleSettingsRef.current.isRaining){
       requestRef.current = requestAnimationFrame(animate);

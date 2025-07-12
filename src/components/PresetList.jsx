@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Box from '@mui/material/Box';
+import { UpdatePresetButton } from './UpdatePresetButton'
 
 // StyledMenu copied from MUI docs
 const StyledMenu = styled((props) => (
@@ -50,7 +51,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-export function PresetList({ presetData, propogatePreset, deletePreset }) {
+export function PresetList({ presetData, propogatePreset, deletePreset, updatePreset }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOption, setSelectedOption] = useState(presetData[0]?.id || '');
   const open = Boolean(anchorEl);
@@ -123,6 +124,7 @@ export function PresetList({ presetData, propogatePreset, deletePreset }) {
           </MenuItem>
         ))}
       </StyledMenu>
+      <UpdatePresetButton updatePreset={updatePreset}/>
     </div>
   );
 }

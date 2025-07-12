@@ -5,7 +5,7 @@ import './App.css'
 
 import { PresetList } from './components/PresetList'
 import { CreatePreset } from './components/CreatePreset'
-import { get_presets, create_preset, delete_preset } from './api/endpoints'
+import { get_presets, create_preset, delete_preset, update_preset } from './api/endpoints'
 
 import { SynthSettings } from './components/synth/SynthSettings'
 import { ReverbControls } from './components/synth/Reverb'
@@ -16,13 +16,13 @@ import { audioCtx, gain, filter } from './context/audioContext';
 function App() {
   const [presets, setPresets] = useState([]);
   // ************* Preset List stuff
-  // run this code to fetch presets on page load
+  // fetch presets on page load
+  const fetchPresets = async () => {
+    const presets = await get_presets();
+    setPresets(presets);
+  }
+
   useEffect(() => {
-    const fetchPresets = async () => {
-      const presets = await get_presets();
-      setPresets(presets);
-      console.log(presets);
-    }
     fetchPresets();
   }, [])
 
@@ -36,7 +36,6 @@ function App() {
       "filter_frequency": filterSettings.frequency,
       "filter_q": filterSettings.Q
     }
-    console.log(preset_object);
     const preset = await create_preset(preset_object);
     // update client side, update state by adding new preset.
     setPresets([preset, ...presets]);
@@ -48,12 +47,30 @@ function App() {
     setPresets(presets.filter(preset => preset.id !== id));
   }
 
+  const updatePreset = async () => {
+    const currentPreset = presets.find(preset => preset.id === currentPresetId);
+    const preset_object = {
+      "title": currentPreset.title,
+      "ripple_speed": rippleSettings.rippleSpeed,
+      "ripple_sustain": rippleSettings.decay,
+      "amount_of_rain": rippleSettings.displayRainSpeed,
+      "octave": synthSettings.octave,
+      "filter_frequency": filterSettings.frequency,
+      "filter_q": filterSettings.Q
+    }
+    const preset = await update_preset(currentPresetId, preset_object);
+    // update client side with updated preset list after updating backend.
+    fetchPresets();
+  }
+
 
   // ************** Audio stuff
 
   const [synthSettings, setSynthSettings] = useState({
     octave: 2
   })
+
+  const [currentPresetId, setcurrentPresetId] = useState(0)
 
   // frequency default sets color to blue
   const [filterSettings, setFilterSettings] = useState({
@@ -117,6 +134,7 @@ function App() {
 
   const propogatePreset = (id) => {
     const currentPreset = presets.find(preset => preset.id === parseInt(id));
+    setcurrentPresetId(id);
     setFilterSettings(prev => ({ 
       ...prev, 
       frequency: currentPreset.filter_frequency,
@@ -159,7 +177,7 @@ function App() {
             changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls rippleSettings={rippleSettings}/>
-          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset}/>
+          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset} updatePreset={updatePreset}/>
           <CreatePreset add_preset={createPreset}/>
         </div>
       </div>
