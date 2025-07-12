@@ -159,7 +159,7 @@ function App() {
             changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls rippleSettings={rippleSettings}/>
-          <PresetList presetData={presets} propogatePreset={propogatePreset}/>
+          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset}/>
           <CreatePreset add_preset={createPreset}/>
         </div>
       </div>

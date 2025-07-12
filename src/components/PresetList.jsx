@@ -3,7 +3,10 @@ import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Box from '@mui/material/Box';
 
 // StyledMenu copied from MUI docs
 const StyledMenu = styled((props) => (
@@ -34,6 +37,9 @@ const StyledMenu = styled((props) => (
       padding: '4px 0',
     },
     '& .MuiMenuItem-root': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       '&:active': {
         backgroundColor: alpha(
           theme.palette.primary.main,
@@ -44,7 +50,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-export function PresetList({ presetData, propogatePreset }) {
+export function PresetList({ presetData, propogatePreset, deletePreset }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOption, setSelectedOption] = useState(presetData[0]?.id || '');
   const open = Boolean(anchorEl);
@@ -58,6 +64,18 @@ export function PresetList({ presetData, propogatePreset }) {
     if (presetId && presetId !== selectedOption) {
       setSelectedOption(presetId);
       propogatePreset(presetId);
+    }
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); // Prevent selecting the item or closing the menu
+    await deletePreset(id);
+    // Optionally: reset selected preset if deleted one was active
+    if (id === selectedOption) {
+      const remaining = presetData.filter(p => p.id !== id);
+      const newSelected = remaining[0]?.id || '';
+      setSelectedOption(newSelected);
+      if (newSelected) propogatePreset(newSelected);
     }
   };
 
@@ -92,7 +110,16 @@ export function PresetList({ presetData, propogatePreset }) {
             selected={preset.id === selectedOption}
             onClick={() => handleClose(preset.id)}
           >
-            {preset.title}
+            <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {preset.title}
+            </Box>
+            <IconButton
+              size="small"
+              edge="end"
+              onClick={(e) => handleDelete(e, preset.id)}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           </MenuItem>
         ))}
       </StyledMenu>
