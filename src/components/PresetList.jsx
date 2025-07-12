@@ -55,6 +55,7 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOption, setSelectedOption] = useState(presetData[0]?.id || '');
   const open = Boolean(anchorEl);
+  const noDeleteDefaultPresetId = 0;
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -62,21 +63,17 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
 
   const handleClose = (presetId) => {
     setAnchorEl(null);
-    if (presetId && presetId !== selectedOption) {
+    if (presetId != null && presetId !== selectedOption) {
       setSelectedOption(presetId);
       propogatePreset(presetId);
     }
   };
 
   const handleDelete = async (e, id) => {
-    e.stopPropagation(); // Prevent selecting the item or closing the menu
     await deletePreset(id);
-    // Optionally: reset selected preset if deleted one was active
     if (id === selectedOption) {
-      const remaining = presetData.filter(p => p.id !== id);
-      const newSelected = remaining[0]?.id || '';
-      setSelectedOption(newSelected);
-      if (newSelected) propogatePreset(newSelected);
+      setSelectedOption(noDeleteDefaultPresetId);
+      propogatePreset(noDeleteDefaultPresetId);
     }
   };
 
@@ -114,13 +111,14 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
             <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {preset.title}
             </Box>
-            <IconButton
-              size="small"
-              edge="end"
-              onClick={(e) => handleDelete(e, preset.id)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+            { preset.id !== noDeleteDefaultPresetId ? 
+            	<IconButton
+            	  size="small"
+            	  edge="end"
+            	  onClick={(e) => handleDelete(e, preset.id)}>
+            	  <DeleteIcon fontSize="small" />
+            	</IconButton> : null
+            }
           </MenuItem>
         ))}
       </StyledMenu>

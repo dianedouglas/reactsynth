@@ -15,6 +15,7 @@ import { audioCtx, gain, filter } from './context/audioContext';
 
 function App() {
   const [presets, setPresets] = useState([]);
+  const [currentPresetId, setcurrentPresetId] = useState(0)
   // ************* Preset List stuff
   // fetch presets on page load
   const fetchPresets = async () => {
@@ -69,8 +70,6 @@ function App() {
   const [synthSettings, setSynthSettings] = useState({
     octave: 2
   })
-
-  const [currentPresetId, setcurrentPresetId] = useState(0)
 
   // frequency default sets color to blue
   const [filterSettings, setFilterSettings] = useState({
