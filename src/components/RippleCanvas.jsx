@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
 import * as CONFIG from '../utils/constants';
+import Button from '@mui/material/Button';
 
 export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSettings, setRippleSettings}){
   // used for calculating how ripples dissipate
@@ -150,8 +151,8 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
   return (
     <div>
       <div className="master-controls">
-        <button onClick={startRain}>Start</button>
-        <button onClick={stopRain}>Stop</button>
+        <Button variant="contained" size="large" onClick={startRain}>Start</Button>
+        <Button variant="contained" size="large" onClick={stopRain}>Stop</Button>
       </div>
       <canvas ref={canvasRef} width={CONFIG.CANVAS_WIDTH} height={CONFIG.CANVAS_HEIGHT} style={{ border: '1px solid black' }} />
       <div>
