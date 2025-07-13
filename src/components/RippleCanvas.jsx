@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { scaleValue } from '../utils/mathHelpers';
 import * as CONFIG from '../utils/constants';
-import Button from '@mui/material/Button';
+import { Button, Box, Typography, Slider } from '@mui/material';
 
 export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSettings, setRippleSettings}){
   // used for calculating how ripples dissipate
@@ -135,15 +135,13 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
   }
 
   // triggered by moving the rain speed slider.
-  const calculateRainSpeed = (e) => {
-    let {value} = e.target;
+  const calculateRainSpeed = (value) => {
     let invertedValue = scaleValue(value, rainIntervalMin, rainIntervalMax, rainIntervalMax, rainIntervalMin);
     setRippleSettings({...rippleSettingsRef.current, rainSpeed: invertedValue, displayRainSpeed: value})
   }
 
   // triggered by moving any other component sliders
-  const changeRippleSettings = (e) => {
-    let { value, id } = e.target;
+  const changeRippleSettings = (id, value) => {
     const numericValue = parseFloat(value);
     setRippleSettings({ ...rippleSettingsRef.current, [id]: numericValue });
   };
@@ -155,43 +153,54 @@ export function RippleCanvas({playNote, filterSettings, synthSettings, rippleSet
         <Button variant="contained" size="large" onClick={stopRain}>Stop</Button>
       </div>
       <canvas ref={canvasRef} width={CONFIG.CANVAS_WIDTH} height={CONFIG.CANVAS_HEIGHT} style={{ border: '1px solid black' }} />
-      <div>
-        <label htmlFor="rippleSpeed">Speed</label>
-        <input 
-          type="range" 
-          id="rippleSpeed" 
-          name="rippleSpeed" 
-          max="100"
-          step="0.01"
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography id="rippleSpeed-label" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }} gutterBottom>
+          Ripple Speed
+        </Typography>
+        <Slider
+          aria-labelledby="rippleSpeed-label"
           value={rippleSettings.rippleSpeed}
-          onChange={changeRippleSettings}>
-        </input>
-      </div>
-      <div>
-        <label htmlFor="decay">Sustain</label>
-        <input 
-          type="range" 
-          id="decay" 
-          name="decay" 
-          max="10"
-          step="0.01"
+          onChange={(event, newValue) => changeRippleSettings('rippleSpeed', newValue)}
+          min={0}
+          max={100}
+          step={0.01}
+          name="rippleSpeed"
+          id="rippleSpeed"
+          sx={{ flexGrow: 1 }} 
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography id="decay-label" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }} gutterBottom>
+          Sustain
+        </Typography>
+        <Slider
+          aria-labelledby="decay-label"
           value={rippleSettings.decay}
-          onChange={changeRippleSettings}>
-        </input>
-      </div>
-      <div>
-        <label htmlFor="rainSpeed">Amount of Rain</label>
-        <input 
-          type="range" 
-          id="rainSpeed" 
-          name="rainSpeed"
+          onChange={(event, newValue) => changeRippleSettings('decay', newValue)}
+          min={0}
+          max={10}
+          step={0.01}
+          name="decay"
+          id="decay" 
+          sx={{ flexGrow: 1 }}
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography id="rainSpeed-label" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }} gutterBottom>
+          Amount of Rain
+        </Typography>
+        <Slider
+          aria-labelledby="rainSpeed-label"
+          value={rippleSettings.displayRainSpeed}
+          onChange={(event, newValue) => calculateRainSpeed(newValue)}
           min={rainIntervalMin}
           max={rainIntervalMax}
-          step="20"
-          value={rippleSettings.displayRainSpeed}
-          onChange={calculateRainSpeed}>
-        </input>
-      </div>
+          step={20}
+          name="rainSpeed"
+          id="rainSpeed" 
+          sx={{ flexGrow: 1 }} 
+        />
+      </Box>
     </div>
   );
 };

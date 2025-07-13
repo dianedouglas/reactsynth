@@ -120,17 +120,15 @@ function App() {
     lightness: scaleValue(filterSettings.Q, 0, 3, 40, 100)
   })
 
-  const changeSynthSettings = (e) => {
+  const changeSynthSettings = (id, value) => {
     // right now this is just used to set the octave for the synth
     // but other settings could be added by using the correct id and then updating the osc.
     // synthSettings are passed into the newNote function triggered by new ripples in RippleCanvas
-    let {value, id} = e.target;
     setSynthSettings(prev => ({ ...prev, [id]: value }));
   }
 
   // update the actual filter instance and then update the filterSettings state.
-  const changeFilterSettings = (e) => {
-    const { value, id } = e.target;
+  const changeFilterSettings = (id, value) => {
     filter[id].value = value;
     setFilterSettings(prev => ({ ...prev, [id]: value }));
   }
@@ -188,8 +186,10 @@ function App() {
             changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls rippleSettings={rippleSettings}/>
-          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset} updatePreset={updatePreset} currentPresetId={currentPresetId}/>
-          <CreatePreset add_preset={createPreset}/>
+          <div className="preset-controls">
+            <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset} updatePreset={updatePreset} currentPresetId={currentPresetId}/>
+            <CreatePreset add_preset={createPreset}/>
+          </div>
         </div>
       </div>
     </>

@@ -79,49 +79,53 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
   const selectedTitle = presetData.find(p => p.id === currentPresetId)?.title || 'Presets';
 
   return (
-    <div className="top-of-preset-form">
-      <Button
-        id="preset-button"
-        aria-controls={open ? 'preset-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        variant="contained"
-        disableElevation
-        onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
-      >
-        {selectedTitle}
-      </Button>
-      <StyledMenu
-        id="preset-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={() => handleClose(null)}
-        MenuListProps={{
-          'aria-labelledby': 'preset-button',
-        }}
-      >
-        {presetData.map((preset) => (
-          <MenuItem
-            key={preset.id}
-            selected={preset.id === currentPresetId}
-            onClick={() => handleClose(preset.id)}
-          >
-            <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {preset.title}
-            </Box>
-            { preset.id !== noDeleteDefaultPresetId ? 
-            	<IconButton
-            	  size="small"
-            	  edge="end"
-            	  onClick={(e) => handleDelete(e, preset.id)}>
-            	  <DeleteIcon fontSize="small" />
-            	</IconButton> : null
-            }
-          </MenuItem>
-        ))}
-      </StyledMenu>
-      <UpdatePresetButton updatePreset={updatePreset} disabled={currentPresetId === noDeleteDefaultPresetId}/>
+    <div className="row top-of-preset-form">
+      <div className="column-left">
+        <Button
+          id="preset-button"
+          aria-controls={open ? 'preset-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          variant="contained"
+          disableElevation
+          onClick={handleClick}
+          endIcon={<KeyboardArrowDownIcon />}
+        >
+          {selectedTitle}
+        </Button>
+        <StyledMenu
+          id="preset-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={() => handleClose(null)}
+          MenuListProps={{
+            'aria-labelledby': 'preset-button',
+          }}
+        >
+          {presetData.map((preset) => (
+            <MenuItem
+              key={preset.id}
+              selected={preset.id === currentPresetId}
+              onClick={() => handleClose(preset.id)}
+            >
+              <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {preset.title}
+              </Box>
+              { preset.id !== noDeleteDefaultPresetId ? 
+              	<IconButton
+              	  size="small"
+              	  edge="end"
+              	  onClick={(e) => handleDelete(e, preset.id)}>
+              	  <DeleteIcon fontSize="small" />
+              	</IconButton> : null
+              }
+            </MenuItem>
+          ))}
+        </StyledMenu>
+      </div>
+      <div className="column-right">
+        <UpdatePresetButton updatePreset={updatePreset} disabled={currentPresetId === noDeleteDefaultPresetId}/>
+      </div>
     </div>
   );
 }

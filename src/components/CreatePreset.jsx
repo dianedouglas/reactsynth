@@ -20,26 +20,35 @@ export function CreatePreset({ add_preset }) {
   };
 
   return (
-    <div className="form">
-      <TextField
-        id="preset-name"
-        label="Name Your Preset"
-        variant="filled"
-        size="small"
-        value={name}
-        onChange={(e) => {
-          setName(e.target.value);
-          if (hasError) setHasError(false); // Clear error on change
-        }}
-        error={hasError}
-        helperText={hasError ? 'This field is required' : ''}
-        required
-        type="text"
-        focused
-      />
-      <Button onClick={handleClick} variant="contained" size="large">
-        Save New Preset
-      </Button>
+    <div className="row form">
+      <div className="column-left">
+        <TextField
+          id="preset-name"
+          label="Name Your Preset"
+          variant="filled"
+          size="small"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (hasError) setHasError(false); // Clear error on change
+          }}
+          error={hasError}
+          helperText={hasError ? 'This field is required' : ''}
+          required
+          type="text"
+          focused
+          sx={{
+            input: {
+              color: 'white',
+            }
+          }}
+        />
+      </div>
+      <div className="column-right">
+        <Button onClick={handleClick} variant="contained" size="large">
+          Save New Preset
+        </Button>
+      </div>
     </div>
   );
 }
