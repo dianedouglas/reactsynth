@@ -14,17 +14,28 @@ import { RippleCanvas } from './components/RippleCanvas'
 import { audioCtx, gain, filter } from './context/audioContext';
 
 function App() {
-  const [presets, setPresets] = useState([]);
+  const default_preset = {
+    "id": 0,
+    "title": "Default Settings",
+    "ripple_speed": 25.0,
+    "ripple_sustain": 5.0,
+    "amount_of_rain": 300,
+    "octave": 2,
+    "filter_frequency": 589,
+    "filter_q": 1
+  }
+  const [presets, setPresets] = useState([default_preset]);
   const [currentPresetId, setcurrentPresetId] = useState(0)
   // ************* Preset List stuff
   // fetch presets on page load
   const fetchPresets = async () => {
     const presets = await get_presets();
-    setPresets(presets);
+    setPresets([default_preset, ...presets]);
   }
 
   useEffect(() => {
     fetchPresets();
+    propogatePreset(0);
   }, [])
 
   const createPreset = async (title) => {
@@ -176,7 +187,7 @@ function App() {
             changeFilterSettings={changeFilterSettings} 
           />
           <ReverbControls rippleSettings={rippleSettings}/>
-          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset} updatePreset={updatePreset}/>
+          <PresetList presetData={presets} propogatePreset={propogatePreset} deletePreset={deletePreset} updatePreset={updatePreset} currentPresetId={currentPresetId}/>
           <CreatePreset add_preset={createPreset}/>
         </div>
       </div>

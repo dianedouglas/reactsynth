@@ -51,9 +51,8 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-export function PresetList({ presetData, propogatePreset, deletePreset, updatePreset }) {
+export function PresetList({ presetData, propogatePreset, deletePreset, updatePreset, currentPresetId }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedOption, setSelectedOption] = useState(presetData[0]?.id || '');
   const open = Boolean(anchorEl);
   const noDeleteDefaultPresetId = 0;
 
@@ -63,21 +62,19 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
 
   const handleClose = (presetId) => {
     setAnchorEl(null);
-    if (presetId != null && presetId !== selectedOption) {
-      setSelectedOption(presetId);
+    if (presetId != null && presetId !== currentPresetId) {
       propogatePreset(presetId);
     }
   };
 
   const handleDelete = async (e, id) => {
     await deletePreset(id);
-    if (id === selectedOption) {
-      setSelectedOption(noDeleteDefaultPresetId);
+    if (id === currentPresetId) {
       propogatePreset(noDeleteDefaultPresetId);
     }
   };
 
-  const selectedTitle = presetData.find(p => p.id === selectedOption)?.title || 'Presets';
+  const selectedTitle = presetData.find(p => p.id === currentPresetId)?.title || 'Presets';
 
   return (
     <div className="top-of-preset-form">
@@ -105,7 +102,7 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
         {presetData.map((preset) => (
           <MenuItem
             key={preset.id}
-            selected={preset.id === selectedOption}
+            selected={preset.id === currentPresetId}
             onClick={() => handleClose(preset.id)}
           >
             <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
