@@ -71,6 +71,8 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
     await deletePreset(id);
     if (id === currentPresetId) {
       propogatePreset(noDeleteDefaultPresetId);
+    } else {
+      propogatePreset(currentPresetId);
     }
   };
 
