@@ -50,7 +50,8 @@ function App() {
     }
     const preset = await create_preset(preset_object);
     // update client side, update state by adding new preset.
-    setPresets([preset, ...presets]);
+    setPresets([...presets, preset]);
+    setcurrentPresetId(preset.id);
   }
 
   const deletePreset = async (id) => {
