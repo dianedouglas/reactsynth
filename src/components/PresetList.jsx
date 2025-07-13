@@ -121,7 +121,7 @@ export function PresetList({ presetData, propogatePreset, deletePreset, updatePr
           </MenuItem>
         ))}
       </StyledMenu>
-      <UpdatePresetButton updatePreset={updatePreset}/>
+      <UpdatePresetButton updatePreset={updatePreset} disabled={currentPresetId === noDeleteDefaultPresetId}/>
     </div>
   );
 }
