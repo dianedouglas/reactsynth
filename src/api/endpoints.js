@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/'
-// const BASE_URL = 'https://protected-escarpment-28699-5084c61b5747.herokuapp.com/api/'
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const GET_URL = `${BASE_URL}presets`
 const POST_URL = `${BASE_URL}presets`
 const DELETE_URL = (id) => `${BASE_URL}presets/${id}`
